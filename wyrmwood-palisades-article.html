@@ -1,0 +1,1953 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Manilla Road — Crystal Logic · Wyrmwood Palisades</title>
+        <link
+            href="https://fonts.googleapis.com/css2?family=UnifrakturMaguntia&family=MedievalSharp&family=Cinzel:wght@400;600;700;900&family=Cinzel+Decorative:wght@400;700&family=IM+Fell+English:ital@0;1&family=Crimson+Pro:ital,wght@0,400;0,600;1,400;1,600&display=swap"
+            rel="stylesheet"
+        />
+        <link
+            rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+        />
+
+        <style>
+            /* ══════════════════════════════
+     TOKENS
+  ══════════════════════════════ */
+            :root {
+                --black: #1e1e1e;
+                --near-black: #272624;
+                --red: #c4947a;
+                --red-dim: #6b5248;
+                --red-pale: #e8b89a;
+                --red-wash: rgba(196, 148, 122, 0.1);
+                --white: #e8e0cc;
+                --white-dim: #9a9080;
+                --panel-bg: #222120;
+                --teal: #4a7070;
+                --teal-lt: #8ab4b0;
+                --amber: #c8a878;
+                --rust: #a07060;
+            }
+
+            [data-theme="light"] {
+                --black: #f0e8d8;
+                --near-black: #e4d8c4;
+                --red: #8a4a30;
+                --red-dim: #b07858;
+                --red-pale: #6a3820;
+                --red-wash: rgba(138, 74, 48, 0.08);
+                --white: #3a3028;
+                --white-dim: #6a5e50;
+                --panel-bg: #e8ddc8;
+                --teal: #7a3a28;
+                --teal-lt: #9a4a32;
+                --amber: #7a4e28;
+                --rust: #9a5838;
+            }
+
+            *,
+            *::before,
+            *::after {
+                box-sizing: border-box;
+                margin: 0;
+                padding: 0;
+            }
+
+            body {
+                background: var(--black);
+                color: var(--white);
+                font-family: "IM Fell English", Georgia, serif;
+                overflow-x: hidden;
+                min-height: 100vh;
+            }
+
+            /* ══════════════════════════════
+     HEADER
+  ══════════════════════════════ */
+            header {
+                border-bottom: 1px solid var(--red-dim);
+                position: relative;
+                overflow: hidden;
+            }
+
+            .top-bar {
+                background: var(--near-black);
+                border-bottom: 1px solid var(--red-dim);
+                padding: 6px 28px;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+            }
+            .top-bar-label {
+                font-family: "Cinzel", serif;
+                font-size: 0.6rem;
+                letter-spacing: 0.35em;
+                text-transform: uppercase;
+                color: var(--white-dim);
+                display: flex;
+                align-items: center;
+                gap: 12px;
+            }
+            .top-bar-label::before {
+                content: "";
+                display: inline-block;
+                width: 6px;
+                height: 6px;
+                border: 1px solid var(--red-dim);
+                transform: rotate(45deg);
+            }
+            .top-bar-num {
+                font-family: "Cinzel", serif;
+                font-size: 0.65rem;
+                letter-spacing: 0.2em;
+                color: var(--red-pale);
+                border: 1px solid var(--red-dim);
+                padding: 2px 8px;
+            }
+
+            .header-body {
+                padding: 32px 36px 0;
+                display: grid;
+                grid-template-columns: 1fr auto;
+                gap: 24px;
+                align-items: start;
+                position: relative;
+                z-index: 2;
+            }
+            .header-body::before {
+                content: "";
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background:
+                    radial-gradient(
+                        ellipse 65% 80% at 25% 50%,
+                        rgba(138, 180, 176, 0.12) 0%,
+                        transparent 60%
+                    ),
+                    radial-gradient(
+                        ellipse 45% 60% at 85% 35%,
+                        rgba(200, 168, 120, 0.1) 0%,
+                        transparent 55%
+                    );
+                pointer-events: none;
+            }
+
+            .site-title {
+                font-family: "UnifrakturMaguntia", cursive;
+                font-size: clamp(4rem, 13vw, 9rem);
+                line-height: 0.88;
+                color: var(--white);
+                letter-spacing: 0.02em;
+                text-shadow:
+                    2px 2px 0 rgba(0, 0, 0, 0.25),
+                    0 0 30px rgba(196, 148, 122, 0.12),
+                    1px 0 0 rgba(196, 148, 122, 0.15);
+                animation: revealDown 0.8s cubic-bezier(0.16, 1, 0.3, 1) both;
+                position: relative;
+            }
+
+            .header-nav-block {
+                display: none;
+                flex-direction: column;
+                border: 1px solid var(--red-dim);
+                align-self: start;
+                margin-top: 4px;
+                animation: fadeIn 0.8s ease 0.3s both;
+            }
+            .header-nav-block a {
+                font-family: "Cinzel", serif;
+                font-size: 0.68rem;
+                letter-spacing: 0.22em;
+                text-transform: uppercase;
+                color: var(--white-dim);
+                text-decoration: none;
+                padding: 9px 18px;
+                border-bottom: 1px solid var(--red-dim);
+                transition:
+                    background 0.2s,
+                    color 0.2s;
+                white-space: nowrap;
+            }
+            .header-nav-block a:last-child {
+                border-bottom: none;
+            }
+            .header-nav-block a:hover {
+                background: var(--red-dim);
+                color: var(--white);
+            }
+
+            .hamburger {
+                display: none;
+                flex-direction: column;
+                justify-content: center;
+                gap: 5px;
+                width: 36px;
+                height: 36px;
+                background: none;
+                border: 1px solid var(--red-dim);
+                cursor: pointer;
+                padding: 8px;
+                align-self: start;
+                margin-top: 4px;
+                transition: background 0.2s;
+            }
+            .hamburger:hover {
+                background: var(--red-wash);
+            }
+            .hamburger span {
+                display: block;
+                width: 100%;
+                height: 1px;
+                background: var(--white-dim);
+                transition:
+                    transform 0.2s,
+                    opacity 0.2s;
+            }
+            .hamburger.open span:nth-child(1) {
+                transform: translateY(6px) rotate(45deg);
+            }
+            .hamburger.open span:nth-child(2) {
+                opacity: 0;
+            }
+            .hamburger.open span:nth-child(3) {
+                transform: translateY(-6px) rotate(-45deg);
+            }
+
+            @media (max-width: 640px) {
+                .hamburger {
+                    display: flex;
+                }
+                .header-nav-block.open {
+                    display: flex;
+                    position: absolute;
+                    top: 55%;
+                    right: 0;
+                    background: var(--near-black);
+                    z-index: 100;
+                    border: 1px solid var(--red-dim);
+                    min-width: 160px;
+                }
+                .sub-nav {
+                    display: none !important;
+                }
+                header {
+                    border-bottom: none;
+                }
+            }
+
+            .header-tagline {
+                padding: 14px 36px 24px;
+                font-family: "IM Fell English", Georgia, serif;
+                font-style: italic;
+                font-size: 1rem;
+                color: var(--white-dim);
+                line-height: 1.7;
+                max-width: 540px;
+                animation: fadeIn 0.8s ease 0.2s both;
+                letter-spacing: 0.02em;
+            }
+
+            .sub-nav {
+                border-top: 1px solid var(--red-dim);
+                display: none;
+                overflow: hidden;
+                align-items: center;
+                animation: fadeIn 0.8s ease 0.4s both;
+            }
+            @media (min-width: 641px) {
+                .sub-nav {
+                    display: flex;
+                }
+            }
+
+            .sub-nav a {
+                font-family: "Cinzel", serif;
+                font-size: 0.62rem;
+                letter-spacing: 0.28em;
+                text-transform: uppercase;
+                color: var(--white-dim);
+                text-decoration: none;
+                padding: 10px 20px;
+                border-right: 1px solid var(--red-dim);
+                transition:
+                    color 0.2s,
+                    background 0.2s;
+                display: flex;
+                align-items: center;
+            }
+            .sub-nav a:hover {
+                color: var(--white);
+                background: var(--red-wash);
+            }
+            .sub-nav a.active {
+                color: var(--teal-lt);
+            }
+            .sub-nav .spacer {
+                flex: 1;
+            }
+            .sub-nav .issue {
+                font-family: "IM Fell English", serif;
+                font-style: italic;
+                font-size: 0.72rem;
+                color: var(--red-dim);
+                display: flex;
+                align-items: center;
+                padding: 0 20px;
+            }
+
+            /* ══════════════════════════════
+     PAGE WRAP
+  ══════════════════════════════ */
+            .page-wrap {
+                max-width: 1020px;
+                margin: 0 auto;
+                padding: 40px 36px 60px;
+                position: relative;
+                z-index: 2;
+                animation: revealUp 0.7s ease 0.45s both;
+            }
+
+            /* ══════════════════════════════
+     SHARED COMPONENTS
+  ══════════════════════════════ */
+
+            /* Section divider */
+            .section-label {
+                display: flex;
+                align-items: center;
+                gap: 16px;
+                padding-top: 14px;
+                margin-bottom: 1px;
+            }
+            .section-label-text {
+                font-family: "UnifrakturMaguntia", cursive;
+                font-size: 2rem;
+                color: var(--teal-lt);
+                text-shadow:
+                    1px 1px 0 rgba(0, 0, 0, 0.2),
+                    0 0 15px rgba(138, 180, 176, 0.2);
+                white-space: nowrap;
+            }
+            .section-rule {
+                flex: 1;
+                height: 1px;
+                background: linear-gradient(
+                    to right,
+                    var(--red-dim),
+                    rgba(138, 180, 176, 0.25),
+                    var(--red-dim)
+                );
+            }
+            .section-ornament {
+                color: var(--teal-lt);
+                font-size: 0.9rem;
+            }
+
+            /* Three-card grid */
+            .card-grid {
+                display: grid;
+                grid-template-columns: repeat(3, 1fr);
+                border: 1px solid var(--red-dim);
+                border-top: none;
+                margin-bottom: 44px;
+            }
+            @media (max-width: 600px) {
+                .card-grid {
+                    grid-template-columns: 1fr;
+                }
+            }
+
+            .card {
+                padding: 22px 20px;
+                border-right: 1px solid var(--red-dim);
+                position: relative;
+                overflow: hidden;
+                transition: background 0.2s;
+                text-decoration: none;
+                color: inherit;
+                display: block;
+            }
+            .card:last-child {
+                border-right: none;
+            }
+            .card:hover {
+                background: rgba(196, 148, 122, 0.04);
+            }
+            .card::after {
+                content: "";
+                position: absolute;
+                inset: 0;
+                pointer-events: none;
+                background-image: radial-gradient(
+                    circle,
+                    rgba(196, 148, 122, 0.05) 1px,
+                    transparent 1px
+                );
+                background-size: 7px 7px;
+                opacity: 0;
+                transition: opacity 0.3s;
+            }
+            .card:hover::after {
+                opacity: 1;
+            }
+
+            .card-num {
+                font-family: "Cinzel", serif;
+                font-size: 3.5rem;
+                font-weight: 700;
+                letter-spacing: 0.05em;
+                color: rgba(196, 148, 122, 0.22);
+                position: absolute;
+                top: 8px;
+                right: 12px;
+                line-height: 1;
+                pointer-events: none;
+            }
+            .card-cat {
+                font-family: "Cinzel", serif;
+                font-size: 0.58rem;
+                letter-spacing: 0.32em;
+                text-transform: uppercase;
+                color: var(--teal-lt);
+                margin-bottom: 9px;
+            }
+            .card-title {
+                font-family: "Cinzel Decorative", serif;
+                font-size: 1rem;
+                font-weight: 700;
+                line-height: 1.2;
+                letter-spacing: 0.01em;
+                color: var(--white);
+                text-shadow:
+                    1px 1px 0 rgba(0, 0, 0, 0.2),
+                    0 0 15px rgba(138, 180, 176, 0.08);
+                margin-bottom: 11px;
+            }
+            .card-body {
+                font-family: "IM Fell English", serif;
+                font-style: italic;
+                font-size: 0.9rem;
+                line-height: 1.78;
+                color: var(--white-dim);
+                margin-bottom: 16px;
+            }
+            .card-date {
+                font-family: "IM Fell English", serif;
+                font-style: italic;
+                font-size: 0.72rem;
+                color: var(--amber);
+                padding-top: 10px;
+                display: block;
+            }
+
+            /* Tags */
+            .tag {
+                font-family: "Cinzel", serif;
+                font-size: 0.58rem;
+                letter-spacing: 0.15em;
+                text-transform: uppercase;
+                color: var(--white-dim);
+                border: 1px solid var(--red-dim);
+                padding: 3px 9px;
+                text-decoration: none;
+                transition: all 0.2s;
+                display: inline-block;
+            }
+            .tag:hover {
+                background: var(--red-dim);
+                color: var(--white);
+                border-color: var(--red-dim);
+            }
+
+            /* Rating icons */
+            .rating {
+                display: inline-flex;
+                gap: 3px;
+                vertical-align: middle;
+                margin-left: 4px;
+            }
+            .rating i {
+                font-size: 0.65rem;
+                color: var(--amber);
+                opacity: 0.85;
+            }
+
+            /* ══════════════════════════════
+     FOOTER
+  ══════════════════════════════ */
+            footer {
+                border-top: 1px solid var(--red-dim);
+                background: var(--near-black);
+                text-align: center;
+                padding: 32px 28px 28px;
+                position: relative;
+                z-index: 2;
+            }
+            .footer-sigil-svg {
+                width: 200px;
+                height: 150px;
+                margin: 0 auto 14px;
+                display: block;
+                opacity: 0.55;
+                filter: drop-shadow(0 0 18px rgba(232, 224, 204, 0.08));
+            }
+            .foot-title {
+                font-family: "UnifrakturMaguntia", cursive;
+                font-size: 2.8rem;
+                color: var(--white);
+                text-shadow:
+                    1px 1px 0 rgba(0, 0, 0, 0.25),
+                    0 0 30px rgba(196, 148, 122, 0.15),
+                    0 0 60px rgba(138, 180, 176, 0.1);
+                letter-spacing: 0.02em;
+                margin-bottom: 6px;
+            }
+            .foot-sub {
+                font-family: "Cinzel", serif;
+                font-size: 0.58rem;
+                letter-spacing: 0.35em;
+                text-transform: uppercase;
+                color: var(--red-dim);
+                margin-bottom: 4px;
+            }
+            .foot-copy {
+                font-family: "IM Fell English", serif;
+                font-style: italic;
+                font-size: 0.72rem;
+                color: var(--white-dim);
+                opacity: 0.3;
+            }
+
+            /* ══════════════════════════════
+     THEME TOGGLE
+  ══════════════════════════════ */
+            .theme-toggle {
+                position: fixed;
+                bottom: 24px;
+                right: 24px;
+                z-index: 999;
+                background: var(--near-black);
+                border: 1px solid var(--red-dim);
+                color: var(--white-dim);
+                font-family: "Cinzel", serif;
+                font-size: 0.58rem;
+                letter-spacing: 0.22em;
+                text-transform: uppercase;
+                padding: 8px 14px;
+                cursor: pointer;
+                transition:
+                    background 0.2s,
+                    color 0.2s,
+                    border-color 0.2s;
+                display: flex;
+                align-items: center;
+                gap: 8px;
+            }
+            .theme-toggle:hover {
+                background: var(--red-dim);
+                color: var(--white);
+            }
+            .theme-toggle-icon {
+                font-size: 0.9rem;
+                line-height: 1;
+            }
+
+            /* ══════════════════════════════
+     ANIMATIONS
+  ══════════════════════════════ */
+            @keyframes revealDown {
+                from {
+                    opacity: 0;
+                    transform: translateY(-18px);
+                }
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+            @keyframes revealUp {
+                from {
+                    opacity: 0;
+                    transform: translateY(18px);
+                }
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+            @keyframes fadeIn {
+                from {
+                    opacity: 0;
+                }
+                to {
+                    opacity: 1;
+                }
+            }
+            @keyframes breathe {
+                from {
+                    opacity: 0.6;
+                    text-shadow: 0 0 40px rgba(196, 148, 122, 0.15);
+                }
+                to {
+                    opacity: 1;
+                    text-shadow: 0 0 90px rgba(196, 148, 122, 0.3);
+                }
+            }
+
+            /* ══════════════════════════════
+     LIGHT MODE OVERRIDES
+  ══════════════════════════════ */
+            [data-theme="light"] .header-body::before {
+                background:
+                    radial-gradient(
+                        ellipse 65% 80% at 25% 50%,
+                        rgba(80, 120, 110, 0.08) 0%,
+                        transparent 60%
+                    ),
+                    radial-gradient(
+                        ellipse 45% 60% at 85% 35%,
+                        rgba(160, 100, 70, 0.07) 0%,
+                        transparent 55%
+                    );
+            }
+            [data-theme="light"] .foot-title {
+                text-shadow:
+                    1px 1px 0 rgba(255, 255, 255, 0.3),
+                    0 0 20px rgba(138, 74, 48, 0.08);
+            }
+            [data-theme="light"] .section-label-text {
+                text-shadow:
+                    1px 1px 0 rgba(255, 255, 255, 0.3),
+                    0 0 15px rgba(46, 88, 72, 0.1);
+            }
+            [data-theme="light"] .article-hero-caption {
+                background: rgba(232, 220, 200, 0.93);
+            }
+            [data-theme="light"] .article-hero::before {
+                background:
+                    radial-gradient(
+                        ellipse 80% 50% at 50% 15%,
+                        rgba(100, 148, 148, 0.18) 0%,
+                        transparent 68%
+                    ),
+                    radial-gradient(
+                        ellipse 55% 40% at 10% 50%,
+                        rgba(100, 148, 148, 0.1) 0%,
+                        transparent 55%
+                    ),
+                    radial-gradient(
+                        ellipse 100% 55% at 50% 100%,
+                        rgba(160, 100, 70, 0.28) 0%,
+                        rgba(140, 80, 50, 0.1) 45%,
+                        transparent 65%
+                    ),
+                    radial-gradient(
+                        ellipse 65% 40% at 50% 60%,
+                        rgba(220, 205, 185, 0.55) 0%,
+                        transparent 72%
+                    );
+            }
+            [data-theme="light"] .pull-quote {
+                box-shadow:
+                    inset 0 0 0 5px var(--black),
+                    inset 0 0 0 6px var(--red-dim);
+            }
+            [data-theme="light"] .verdict-panel {
+                box-shadow:
+                    inset 0 0 0 5px var(--black),
+                    inset 0 0 0 6px var(--red-dim);
+            }
+            [data-theme="light"] .article-sidebar {
+                border-color: var(--red-dim);
+            }
+
+            /* ══════════════════════════════
+     ARTICLE — BREADCRUMB
+  ══════════════════════════════ */
+            .article-breadcrumb {
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                margin-bottom: 24px;
+                flex-wrap: wrap;
+            }
+            .article-breadcrumb a {
+                font-family: "Cinzel", serif;
+                font-size: 0.58rem;
+                letter-spacing: 0.28em;
+                text-transform: uppercase;
+                color: var(--white-dim);
+                text-decoration: none;
+                transition: color 0.2s;
+            }
+            .article-breadcrumb a:hover {
+                color: var(--teal-lt);
+            }
+            .bc-sep {
+                color: var(--red-dim);
+                font-size: 0.5rem;
+            }
+            .bc-current {
+                font-family: "Cinzel", serif;
+                font-size: 0.58rem;
+                letter-spacing: 0.22em;
+                text-transform: uppercase;
+                color: var(--teal-lt);
+            }
+
+            /* ══════════════════════════════
+     ARTICLE — HERO PANEL
+  ══════════════════════════════ */
+            .article-hero {
+                border: 1px solid var(--red-dim);
+                box-shadow:
+                    inset 0 0 0 7px var(--black),
+                    inset 0 0 0 8px var(--red-dim);
+                background: var(--panel-bg);
+                height: 340px;
+                position: relative;
+                overflow: hidden;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+            @media (max-width: 640px) {
+                .article-hero {
+                    height: 220px;
+                }
+            }
+
+            .article-hero::before {
+                content: "";
+                position: absolute;
+                inset: 0;
+                background:
+                    radial-gradient(
+                        ellipse 80% 50% at 50% 15%,
+                        rgba(138, 180, 176, 0.3) 0%,
+                        rgba(100, 148, 148, 0.08) 50%,
+                        transparent 68%
+                    ),
+                    radial-gradient(
+                        ellipse 55% 40% at 10% 50%,
+                        rgba(138, 180, 176, 0.15) 0%,
+                        transparent 55%
+                    ),
+                    radial-gradient(
+                        ellipse 100% 55% at 50% 100%,
+                        rgba(200, 168, 120, 0.5) 0%,
+                        rgba(160, 110, 80, 0.2) 45%,
+                        transparent 65%
+                    ),
+                    radial-gradient(
+                        ellipse 65% 38% at 50% 60%,
+                        rgba(20, 18, 18, 0.82) 0%,
+                        transparent 72%
+                    );
+            }
+            .article-hero::after {
+                content: "";
+                position: absolute;
+                inset: 0;
+                background-image: radial-gradient(
+                    circle,
+                    rgba(196, 148, 122, 0.05) 1px,
+                    transparent 1px
+                );
+                background-size: 7px 7px;
+                pointer-events: none;
+            }
+            .article-hero .hero-glyph {
+                font-family: "UnifrakturMaguntia", cursive;
+                font-size: 9rem;
+                color: rgba(196, 148, 122, 0.1);
+                text-shadow: 0 0 60px rgba(196, 148, 122, 0.2);
+                z-index: 1;
+                position: relative;
+                animation: breathe 5s ease-in-out infinite alternate;
+                user-select: none;
+            }
+            @media (max-width: 640px) {
+                .article-hero .hero-glyph {
+                    font-size: 6rem;
+                }
+            }
+
+            .article-hero-caption {
+                position: absolute;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                background: rgba(0, 0, 0, 0.72);
+                border-top: 1px solid var(--red-dim);
+                padding: 10px 18px;
+                font-family: "IM Fell English", serif;
+                font-style: italic;
+                font-size: 0.82rem;
+                color: var(--white-dim);
+                z-index: 2;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                gap: 16px;
+            }
+            .article-hero-caption-cat {
+                font-family: "Cinzel", serif;
+                font-style: normal;
+                font-size: 0.55rem;
+                letter-spacing: 0.25em;
+                text-transform: uppercase;
+                color: var(--teal-lt);
+                flex-shrink: 0;
+            }
+
+            /* ══════════════════════════════
+     ARTICLE — META BAR
+  ══════════════════════════════ */
+            .article-meta-bar {
+                display: flex;
+                align-items: stretch;
+                border: 1px solid var(--red-dim);
+                border-top: none;
+                background: var(--near-black);
+                margin-bottom: 40px;
+                overflow: hidden;
+                flex-wrap: wrap;
+            }
+            .article-meta-item {
+                font-family: "Cinzel", serif;
+                font-size: 0.58rem;
+                letter-spacing: 0.26em;
+                text-transform: uppercase;
+                color: var(--white-dim);
+                padding: 9px 18px;
+                border-right: 1px solid var(--red-dim);
+                display: flex;
+                align-items: center;
+                white-space: nowrap;
+            }
+            .article-meta-item:last-child {
+                border-right: none;
+            }
+            .article-meta-item.cat {
+                color: var(--teal-lt);
+            }
+            .article-meta-item.rating-bar {
+                margin-left: auto;
+                border-right: none;
+                border-left: 1px solid var(--red-dim);
+                gap: 8px;
+            }
+            .rating-bar-label {
+                font-family: "Cinzel", serif;
+                font-size: 0.52rem;
+                letter-spacing: 0.2em;
+                color: var(--white-dim);
+            }
+
+            /* ══════════════════════════════
+     ARTICLE — TWO-COLUMN LAYOUT
+  ══════════════════════════════ */
+            .article-layout {
+                display: grid;
+                grid-template-columns: 1fr 284px;
+                gap: 32px;
+                margin-bottom: 52px;
+                align-items: start;
+            }
+            @media (max-width: 780px) {
+                .article-layout {
+                    grid-template-columns: 1fr;
+                }
+            }
+
+            /* ══════════════════════════════
+     ARTICLE — MAIN COLUMN
+  ══════════════════════════════ */
+            .article-kicker {
+                font-family: "Cinzel", serif;
+                font-size: 0.6rem;
+                letter-spacing: 0.38em;
+                text-transform: uppercase;
+                color: var(--teal-lt);
+                margin-bottom: 12px;
+                display: flex;
+                align-items: center;
+                gap: 10px;
+            }
+            .article-kicker::after {
+                content: "";
+                flex: 1;
+                height: 1px;
+                background: var(--red-dim);
+            }
+
+            .article-title {
+                font-family: "Cinzel Decorative", serif;
+                font-size: clamp(1.7rem, 3.8vw, 2.7rem);
+                font-weight: 700;
+                line-height: 1.1;
+                letter-spacing: 0.02em;
+                color: var(--white);
+                text-shadow:
+                    1px 1px 0 rgba(0, 0, 0, 0.2),
+                    0 0 20px rgba(196, 148, 122, 0.1);
+                margin-bottom: 16px;
+            }
+
+            .article-byline {
+                font-family: "IM Fell English", serif;
+                font-style: italic;
+                font-size: 0.8rem;
+                color: var(--red-dim);
+                margin-bottom: 26px;
+                display: flex;
+                align-items: center;
+                gap: 10px;
+            }
+            .article-byline::after {
+                content: "";
+                flex: 1;
+                height: 1px;
+                background: linear-gradient(
+                    to right,
+                    var(--red-dim),
+                    transparent
+                );
+            }
+
+            .article-intro {
+                font-family: "IM Fell English", serif;
+                font-style: italic;
+                font-size: 1.06rem;
+                line-height: 1.92;
+                color: var(--white);
+                margin-bottom: 26px;
+                padding-bottom: 26px;
+                border-bottom: 1px solid rgba(196, 148, 122, 0.2);
+            }
+
+            .article-body-text {
+                font-family: "IM Fell English", serif;
+                font-size: 0.97rem;
+                line-height: 1.95;
+                color: var(--white-dim);
+                margin-bottom: 22px;
+            }
+
+            /* Drop cap on first body paragraph */
+            .article-body-text.drop-cap::first-letter {
+                font-family: "UnifrakturMaguntia", cursive;
+                font-size: 4rem;
+                line-height: 0.72;
+                float: left;
+                margin-right: 9px;
+                margin-top: 5px;
+                color: var(--red);
+                text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.2);
+            }
+
+            /* Ornamental section break */
+            .article-break {
+                text-align: center;
+                color: var(--red-dim);
+                font-size: 0.82rem;
+                letter-spacing: 0.6em;
+                margin: 30px 0;
+                user-select: none;
+            }
+
+            /* ══════════════════════════════
+     ARTICLE — PULL QUOTE
+  ══════════════════════════════ */
+            .pull-quote {
+                border: 1px solid var(--red-dim);
+                box-shadow:
+                    inset 0 0 0 5px var(--black),
+                    inset 0 0 0 6px var(--red-dim);
+                background: var(--panel-bg);
+                padding: 28px 28px 22px;
+                margin: 30px 0;
+                position: relative;
+                overflow: hidden;
+            }
+            .pull-quote::before {
+                content: "";
+                position: absolute;
+                inset: 0;
+                background:
+                    radial-gradient(
+                        ellipse 90% 70% at 50% 50%,
+                        rgba(196, 148, 122, 0.06) 0%,
+                        transparent 68%
+                    ),
+                    radial-gradient(
+                        ellipse 60% 50% at 50% 0%,
+                        rgba(138, 180, 176, 0.06) 0%,
+                        transparent 60%
+                    );
+                pointer-events: none;
+            }
+            .pull-quote::after {
+                content: "";
+                position: absolute;
+                inset: 0;
+                background-image: radial-gradient(
+                    circle,
+                    rgba(196, 148, 122, 0.04) 1px,
+                    transparent 1px
+                );
+                background-size: 7px 7px;
+                pointer-events: none;
+            }
+            .pull-quote-mark {
+                font-family: "UnifrakturMaguntia", cursive;
+                font-size: 4.5rem;
+                line-height: 0.55;
+                color: var(--red-dim);
+                display: block;
+                margin-bottom: 12px;
+                position: relative;
+                z-index: 1;
+            }
+            .pull-quote-text {
+                font-family: "IM Fell English", serif;
+                font-style: italic;
+                font-size: 1.12rem;
+                line-height: 1.82;
+                color: var(--white);
+                position: relative;
+                z-index: 1;
+            }
+            .pull-quote-attr {
+                font-family: "Cinzel", serif;
+                font-size: 0.54rem;
+                letter-spacing: 0.3em;
+                text-transform: uppercase;
+                color: var(--white-dim);
+                margin-top: 16px;
+                display: block;
+                position: relative;
+                z-index: 1;
+            }
+
+            /* ══════════════════════════════
+     ARTICLE — VERDICT PANEL
+  ══════════════════════════════ */
+            .verdict-panel {
+                border: 1px solid var(--red-dim);
+                box-shadow:
+                    inset 0 0 0 5px var(--black),
+                    inset 0 0 0 6px var(--red-dim);
+                background: var(--panel-bg);
+                padding: 26px 26px 22px;
+                margin-top: 34px;
+                position: relative;
+                overflow: hidden;
+            }
+            .verdict-panel::before {
+                content: "";
+                position: absolute;
+                inset: 0;
+                background:
+                    radial-gradient(
+                        ellipse 80% 55% at 50% 100%,
+                        rgba(196, 148, 122, 0.1) 0%,
+                        transparent 65%
+                    ),
+                    radial-gradient(
+                        ellipse 60% 40% at 50% 0%,
+                        rgba(138, 180, 176, 0.07) 0%,
+                        transparent 60%
+                    );
+                pointer-events: none;
+            }
+            .verdict-panel::after {
+                content: "";
+                position: absolute;
+                inset: 0;
+                background-image: radial-gradient(
+                    circle,
+                    rgba(196, 148, 122, 0.04) 1px,
+                    transparent 1px
+                );
+                background-size: 7px 7px;
+                pointer-events: none;
+            }
+            .verdict-header {
+                font-family: "UnifrakturMaguntia", cursive;
+                font-size: 1.8rem;
+                color: var(--teal-lt);
+                text-shadow:
+                    1px 1px 0 rgba(0, 0, 0, 0.2),
+                    0 0 15px rgba(138, 180, 176, 0.2);
+                margin-bottom: 12px;
+                position: relative;
+                z-index: 1;
+            }
+            .verdict-rating {
+                display: flex;
+                align-items: center;
+                gap: 5px;
+                margin-bottom: 18px;
+                position: relative;
+                z-index: 1;
+            }
+            .verdict-rating i {
+                font-size: 1.1rem;
+                color: var(--amber);
+                opacity: 0.9;
+            }
+            .verdict-rating-label {
+                font-family: "Cinzel", serif;
+                font-size: 0.56rem;
+                letter-spacing: 0.3em;
+                text-transform: uppercase;
+                color: var(--white-dim);
+                margin-left: 10px;
+            }
+            .verdict-text {
+                font-family: "IM Fell English", serif;
+                font-style: italic;
+                font-size: 0.95rem;
+                line-height: 1.88;
+                color: var(--white-dim);
+                margin-bottom: 20px;
+                padding-bottom: 20px;
+                border-bottom: 1px solid rgba(196, 148, 122, 0.2);
+                position: relative;
+                z-index: 1;
+            }
+            .verdict-filed {
+                display: flex;
+                align-items: baseline;
+                gap: 14px;
+                flex-wrap: wrap;
+                position: relative;
+                z-index: 1;
+            }
+            .verdict-filed-label {
+                font-family: "Cinzel", serif;
+                font-size: 0.54rem;
+                letter-spacing: 0.3em;
+                text-transform: uppercase;
+                color: var(--white-dim);
+                white-space: nowrap;
+            }
+            .verdict-tags {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 5px;
+            }
+
+            /* ══════════════════════════════
+     ARTICLE — PREV / NEXT NAV
+  ══════════════════════════════ */
+            .article-nav {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                border: 1px solid var(--red-dim);
+                margin-top: 36px;
+                background: var(--red-dim); /* acts as gap colour */
+                gap: 1px;
+            }
+            @media (max-width: 480px) {
+                .article-nav {
+                    grid-template-columns: 1fr;
+                }
+            }
+
+            .article-nav-item {
+                background: var(--black);
+                padding: 16px 20px;
+                text-decoration: none;
+                transition: background 0.2s;
+                display: block;
+            }
+            .article-nav-item:hover {
+                background: var(--red-wash);
+            }
+            .article-nav-item.next {
+                text-align: right;
+            }
+            .article-nav-dir {
+                font-family: "Cinzel", serif;
+                font-size: 0.52rem;
+                letter-spacing: 0.35em;
+                text-transform: uppercase;
+                color: var(--red-dim);
+                display: block;
+                margin-bottom: 5px;
+            }
+            .article-nav-title {
+                font-family: "Crimson Pro", serif;
+                font-size: 0.92rem;
+                font-weight: 600;
+                color: var(--white);
+                line-height: 1.3;
+            }
+
+            /* ══════════════════════════════
+     ARTICLE — SIDEBAR
+  ══════════════════════════════ */
+            .article-sidebar {
+                display: flex;
+                flex-direction: column;
+                border: 1px solid var(--red-dim);
+                position: sticky;
+                top: 24px;
+            }
+            .sidebar-block {
+                border-bottom: 1px solid var(--red-dim);
+                padding: 18px 18px 16px;
+            }
+            .sidebar-block:last-child {
+                border-bottom: none;
+            }
+
+            .sidebar-label {
+                font-family: "Cinzel", serif;
+                font-size: 0.58rem;
+                letter-spacing: 0.3em;
+                text-transform: uppercase;
+                color: var(--teal-lt);
+                margin-bottom: 14px;
+                display: flex;
+                align-items: center;
+                gap: 8px;
+            }
+            .sidebar-label::after {
+                content: "";
+                flex: 1;
+                height: 1px;
+                background: var(--red-dim);
+            }
+
+            /* Author block */
+            .author-monogram {
+                width: 44px;
+                height: 44px;
+                border: 1px solid var(--red-dim);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                margin-bottom: 12px;
+                background: var(--panel-bg);
+            }
+            .author-monogram-glyph {
+                font-family: "UnifrakturMaguntia", cursive;
+                font-size: 1.4rem;
+                color: var(--red);
+                line-height: 1;
+            }
+            .author-name {
+                font-family: "Cinzel", serif;
+                font-size: 0.7rem;
+                letter-spacing: 0.18em;
+                text-transform: uppercase;
+                color: var(--white);
+                margin-bottom: 6px;
+            }
+            .author-bio {
+                font-family: "IM Fell English", serif;
+                font-style: italic;
+                font-size: 0.82rem;
+                line-height: 1.72;
+                color: var(--white-dim);
+            }
+
+            /* Sidebar review items */
+            .sidebar-review {
+                display: block;
+                text-decoration: none;
+                border-bottom: 1px solid rgba(196, 148, 122, 0.15);
+                padding-bottom: 12px;
+                margin-bottom: 12px;
+                transition: opacity 0.2s;
+            }
+            .sidebar-review:last-child {
+                border-bottom: none;
+                padding-bottom: 0;
+                margin-bottom: 0;
+            }
+            .sidebar-review:hover {
+                opacity: 0.75;
+            }
+            .sidebar-review-cat {
+                font-family: "Cinzel", serif;
+                font-size: 0.52rem;
+                letter-spacing: 0.3em;
+                text-transform: uppercase;
+                color: var(--teal-lt);
+                display: block;
+                margin-bottom: 3px;
+            }
+            .sidebar-review-title {
+                font-family: "Crimson Pro", serif;
+                font-size: 0.9rem;
+                font-weight: 600;
+                color: var(--white);
+                line-height: 1.3;
+                display: block;
+                margin-bottom: 4px;
+            }
+            .sidebar-review-date {
+                font-family: "IM Fell English", serif;
+                font-style: italic;
+                font-size: 0.68rem;
+                color: var(--amber);
+                display: block;
+            }
+
+            /* Sidebar tag cloud */
+            .sidebar-tags {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 5px;
+            }
+        </style>
+    </head>
+    <body>
+        <!-- ════════════════════════════════════════
+     HEADER
+════════════════════════════════════════ -->
+        <header>
+            <div class="top-bar">
+                <div class="top-bar-label">
+                    For Rogues, Riff-Lords, and Realm-Seekers
+                </div>
+                <div class="top-bar-num">Vol. I · XII</div>
+            </div>
+
+            <div class="header-body">
+                <div>
+                    <h1 class="site-title">Wyrmwood<br />Palisades</h1>
+                </div>
+                <button
+                    class="hamburger"
+                    id="hamburger"
+                    aria-label="Toggle navigation"
+                    onclick="toggleNav()"
+                >
+                    <span></span><span></span><span></span>
+                </button>
+                <nav class="header-nav-block" id="header-nav">
+                    <a href="#">All Reviews</a>
+                    <a href="#">Music</a>
+                    <a href="#">Fiction</a>
+                    <a href="#">Tabletop</a>
+                    <a href="#">Spotlight</a>
+                    <a href="#">About</a>
+                </nav>
+            </div>
+
+            <p class="header-tagline">
+                Reviews of epic music, high fantasy fiction, and tabletop RPGs —
+                for anyone who has argued about the best fantasy novel, worn out
+                a cassette tape, or rolled dice until midnight . . .
+            </p>
+
+            <nav class="sub-nav">
+                <a href="#">All Reviews</a>
+                <a href="#" class="active">Music</a>
+                <a href="#">Fiction</a>
+                <a href="#">Tabletop</a>
+                <a href="#">Spotlight</a>
+                <a href="#">Archive</a>
+                <div class="spacer"></div>
+                <div class="issue">March Spotlight</div>
+            </nav>
+        </header>
+
+        <!-- ════════════════════════════════════════
+     MAIN
+════════════════════════════════════════ -->
+        <main class="page-wrap">
+            <!-- Breadcrumb -->
+            <nav class="article-breadcrumb" aria-label="Breadcrumb">
+                <a href="#">All Reviews</a>
+                <span class="bc-sep">◆</span>
+                <a href="#">Music</a>
+                <span class="bc-sep">◆</span>
+                <span class="bc-current">Manilla Road — Crystal Logic</span>
+            </nav>
+
+            <!-- Hero panel -->
+            <div
+                class="article-hero"
+                role="img"
+                aria-label="Article hero image — placeholder"
+            >
+                <!-- WP monogram placeholder; replace with <img> when real art is available -->
+                <svg
+                    viewBox="0 0 160 144"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                    style="
+                        width: 160px;
+                        height: 144px;
+                        position: relative;
+                        z-index: 1;
+                        opacity: 0.42;
+                        filter: drop-shadow(0 0 18px rgba(232, 224, 204, 0.14));
+                    "
+                >
+                    <circle
+                        cx="80"
+                        cy="72"
+                        r="66"
+                        stroke="var(--red)"
+                        stroke-width="1"
+                        fill="none"
+                        opacity="0.35"
+                    />
+                    <circle
+                        cx="80"
+                        cy="72"
+                        r="60"
+                        stroke="#e8e0cc"
+                        stroke-width="0.6"
+                        fill="none"
+                        opacity="0.2"
+                    />
+                    <path
+                        d="M80 6 L84 12 L80 18 L76 12 Z"
+                        fill="var(--red)"
+                        opacity="0.7"
+                    />
+                    <path
+                        d="M80 126 L84 132 L80 138 L76 132 Z"
+                        fill="var(--red)"
+                        opacity="0.7"
+                    />
+                    <path
+                        d="M14 72 L20 68 L26 72 L20 76 Z"
+                        fill="var(--red)"
+                        opacity="0.7"
+                    />
+                    <path
+                        d="M134 72 L140 68 L146 72 L140 76 Z"
+                        fill="var(--red)"
+                        opacity="0.7"
+                    />
+                    <text
+                        x="80"
+                        y="98"
+                        font-family="UnifrakturMaguntia, cursive"
+                        font-size="72"
+                        fill="var(--white)"
+                        text-anchor="middle"
+                        opacity="0.9"
+                        letter-spacing="-4"
+                    >
+                        WP
+                    </text>
+                    <line
+                        x1="30"
+                        y1="108"
+                        x2="130"
+                        y2="108"
+                        stroke="var(--red)"
+                        stroke-width="0.8"
+                        opacity="0.5"
+                    />
+                </svg>
+                <div class="article-hero-caption">
+                    <span
+                        >Artwork placeholder — Charcoal edition · NightCafe
+                        generation pending</span
+                    >
+                    <span class="article-hero-caption-cat"
+                        >Music · Heavy Metal</span
+                    >
+                </div>
+            </div>
+
+            <!-- Meta bar -->
+            <div
+                class="article-meta-bar"
+                role="complementary"
+                aria-label="Article metadata"
+            >
+                <div class="article-meta-item cat">Music</div>
+                <div class="article-meta-item">Heavy Metal · Epic</div>
+                <div class="article-meta-item">March MMXXVI</div>
+                <div class="article-meta-item">8 min read</div>
+                <div class="article-meta-item rating-bar">
+                    <span class="rating">
+                        <i class="fa-solid fa-skull"></i>
+                        <i class="fa-solid fa-skull"></i>
+                        <i class="fa-solid fa-skull"></i>
+                        <i class="fa-solid fa-skull"></i>
+                        <i class="fa-solid fa-skull"></i>
+                    </span>
+                    <span class="rating-bar-label">5 / 5</span>
+                </div>
+            </div>
+
+            <!-- Two-column article layout -->
+            <div class="article-layout">
+                <!-- ── Main article column ── -->
+                <article class="article-main">
+                    <div class="article-kicker">
+                        ⚔ Music Review · Heavy Metal
+                    </div>
+
+                    <h1 class="article-title">
+                        Manilla Road —<br />Crystal Logic
+                    </h1>
+
+                    <div class="article-byline">
+                        By The Editor &nbsp;·&nbsp; March MMXXVI &nbsp;·&nbsp;
+                        Black Mesa Records, 1983
+                    </div>
+
+                    <p class="article-intro">
+                        There are records that exist outside of time — not in
+                        the dismissive sense of the timeless radio hit, but in
+                        the strange, almost geological sense of something that
+                        predates the language used to describe it.
+                        <em>Crystal Logic</em> is one of them. Released in 1983
+                        to little commercial notice, it has spent the decades
+                        since becoming one of the most quietly essential texts
+                        in the heavy underground: a record that every serious
+                        listener eventually stumbles across, usually alone,
+                        usually late at night, usually wondering how they missed
+                        it for so long.
+                    </p>
+
+                    <p class="article-body-text drop-cap">
+                        Manilla Road hailed from Wichita, Kansas — not a city
+                        one associates with swords, sorcery, or the long shadow
+                        of the Eternal Champion — and yet Mark Shelton and his
+                        bandmates conjured something on
+                        <em>Crystal Logic</em> that feels lifted directly from
+                        the pages of Moorcock or Leiber. The album opens with
+                        the brooding "Prologue," a short instrumental passage
+                        that functions less as an overture than as a threshold
+                        crossing. You are being asked to leave one world behind
+                        before you can enter another.
+                    </p>
+
+                    <p class="article-body-text">
+                        What follows across eight tracks is a record of
+                        staggering ambition played with deliberate, unhurried
+                        weight. Shelton's guitar tone is not the polished chrome
+                        of contemporary metal; it is something rougher and more
+                        honest — rusted iron, to be precise — and his leads
+                        carry a melodic logic that feels genuinely ancient, as
+                        though he discovered rather than composed them. The
+                        rhythm section of Scott Park and Rick Fisher locks in
+                        with the kind of groove that makes even the more
+                        progressive passages feel inevitable rather than
+                        indulgent.
+                    </p>
+
+                    <div class="article-break">
+                        ✦ &nbsp;&nbsp; ✦ &nbsp;&nbsp; ✦
+                    </div>
+
+                    <p class="article-body-text">
+                        The title track arrives midway through the record like a
+                        thunderclap held for thirty seconds before it falls. At
+                        over nine minutes, it should be an endurance test.
+                        Instead it is the album's beating heart: a slow,
+                        cyclical riff that coils around Shelton's lyric
+                        meditations on fate and the crystalline nature of
+                        destiny — the idea that the future is not written in
+                        water but in stone, already formed, waiting only to be
+                        seen. The solo that erupts around the six-minute mark is
+                        one of the great guitar statements of its era, and it is
+                        almost completely unknown outside a small, devoted
+                        circle.
+                    </p>
+
+                    <div class="pull-quote">
+                        <span class="pull-quote-mark">❝</span>
+                        <p class="pull-quote-text">
+                            <em>Crystal Logic</em> doesn't merely sound old — it
+                            sounds <em>eternal</em>. A relic of a world where
+                            the dungeon was a sacred metaphor and the guitar
+                            solo was a genuine act of incantation.
+                        </p>
+                        <span class="pull-quote-attr"
+                            >— Wyrmwood Palisades, March MMXXVI</span
+                        >
+                    </div>
+
+                    <p class="article-body-text">
+                        "Dreams of Eschaton" and "Feeling Free" round out the
+                        second half with a restless, questing energy — a
+                        wanderer's music, equally suited to hexcrawl sessions
+                        and late-night reading. The production, thin and dry by
+                        contemporary standards, serves the material rather than
+                        smothering it: there is no arena-rock cushion here, no
+                        gloss to put distance between the listener and the song.
+                        You hear the air in the room. You hear the tape.
+                    </p>
+
+                    <p class="article-body-text">
+                        It is worth pausing on why this record speaks so
+                        directly to the tabletop RPG audience, beyond the
+                        obvious fantasy trappings of the lyrics.
+                        <em>Crystal Logic</em> is, structurally, a dungeon. Each
+                        track is a room with its own atmosphere, its own
+                        dangers, its own rewards. Moving through the album is an
+                        act of exploration, and the rewards compound the more
+                        times you descend. That is not an accident. Shelton was
+                        a devoted early D&D player and it shows — not in any
+                        camp or ironic sense, but in the very architecture of
+                        how these songs are built: the pacing, the escalation,
+                        the sense of earned revelation.
+                    </p>
+
+                    <div class="article-break">
+                        ✦ &nbsp;&nbsp; ✦ &nbsp;&nbsp; ✦
+                    </div>
+
+                    <!-- Verdict -->
+                    <div class="verdict-panel">
+                        <div class="verdict-header">The Verdict</div>
+                        <div class="verdict-rating">
+                            <i class="fa-solid fa-skull"></i>
+                            <i class="fa-solid fa-skull"></i>
+                            <i class="fa-solid fa-skull"></i>
+                            <i class="fa-solid fa-skull"></i>
+                            <i class="fa-solid fa-skull"></i>
+                            <span class="verdict-rating-label"
+                                >5 of 5 Skulls</span
+                            >
+                        </div>
+                        <p class="verdict-text">
+                            A foundational text of the heavy underground and
+                            required listening for anyone who takes the form
+                            seriously. <em>Crystal Logic</em> is patient, vast,
+                            and utterly uncompromising — a record that rewards
+                            devotion and punishes distraction. Track it down on
+                            vinyl if you can. Play it loud, in the dark, with a
+                            map spread on the table.
+                        </p>
+                        <div class="verdict-filed">
+                            <span class="verdict-filed-label">File Under</span>
+                            <div class="verdict-tags">
+                                <a href="#" class="tag">Heavy Metal</a>
+                                <a href="#" class="tag">Epic Metal</a>
+                                <a href="#" class="tag">Underground</a>
+                                <a href="#" class="tag">1983</a>
+                                <a href="#" class="tag">Vinyl</a>
+                                <a href="#" class="tag">TTRPG Soundtrack</a>
+                                <a href="#" class="tag">Cult Classic</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Prev / Next navigation -->
+                    <nav class="article-nav" aria-label="Article navigation">
+                        <a href="#" class="article-nav-item prev">
+                            <span class="article-nav-dir">← Previous</span>
+                            <span class="article-nav-title"
+                                >Summoning — With Doom We Come</span
+                            >
+                        </a>
+                        <a href="#" class="article-nav-item next">
+                            <span class="article-nav-dir">Next →</span>
+                            <span class="article-nav-title"
+                                >John Gwynne — A Time of Dread</span
+                            >
+                        </a>
+                    </nav>
+                </article>
+
+                <!-- ── Sidebar column ── -->
+                <aside class="article-sidebar" aria-label="Article sidebar">
+                    <!-- Author block -->
+                    <div class="sidebar-block">
+                        <div class="sidebar-label">The Chronicler</div>
+                        <div class="author-monogram">
+                            <span class="author-monogram-glyph">W</span>
+                        </div>
+                        <div class="author-name">The Editor</div>
+                        <p class="author-bio">
+                            Keeper of the Palisades. Writes about heavy music,
+                            high fantasy, and the spaces where the two meet. Has
+                            rolled dice until midnight more times than is
+                            strictly advisable.
+                        </p>
+                    </div>
+
+                    <!-- Related reviews -->
+                    <div class="sidebar-block">
+                        <div class="sidebar-label">Related Chronicles</div>
+
+                        <a href="#" class="sidebar-review">
+                            <span class="sidebar-review-cat"
+                                >Music · Epic Metal</span
+                            >
+                            <span class="sidebar-review-title"
+                                >Summoning — With Doom We Come</span
+                            >
+                            <span class="sidebar-review-date"
+                                >March MMXXVI ·
+                                <span class="rating">
+                                    <i class="fa-solid fa-skull"></i>
+                                    <i class="fa-solid fa-skull"></i>
+                                    <i class="fa-solid fa-skull"></i>
+                                    <i class="fa-solid fa-skull"></i>
+                                    <i class="fa-solid fa-skull"></i>
+                                </span>
+                            </span>
+                        </a>
+
+                        <a href="#" class="sidebar-review">
+                            <span class="sidebar-review-cat"
+                                >Music · Dungeon Synth</span
+                            >
+                            <span class="sidebar-review-title"
+                                >Wolves in the Throne Room — Primordial
+                                Arcana</span
+                            >
+                            <span class="sidebar-review-date"
+                                >Feb MMXXVI ·
+                                <span class="rating">
+                                    <i class="fa-solid fa-skull"></i>
+                                    <i class="fa-solid fa-skull"></i>
+                                    <i class="fa-solid fa-skull"></i>
+                                    <i class="fa-solid fa-skull"></i>
+                                    <i class="fa-solid fa-skull"></i>
+                                </span>
+                            </span>
+                        </a>
+
+                        <a href="#" class="sidebar-review">
+                            <span class="sidebar-review-cat"
+                                >Music · Cassette</span
+                            >
+                            <span class="sidebar-review-title"
+                                >Caladan Brood — Echoes of Battle
+                                (Reissue)</span
+                            >
+                            <span class="sidebar-review-date"
+                                >Jan MMXXVI ·
+                                <span class="rating">
+                                    <i class="fa-solid fa-skull"></i>
+                                    <i class="fa-solid fa-skull"></i>
+                                    <i class="fa-solid fa-skull"></i>
+                                    <i class="fa-solid fa-skull"></i>
+                                    <i class="fa-solid fa-skull"></i>
+                                </span>
+                            </span>
+                        </a>
+                    </div>
+
+                    <!-- Tag cloud -->
+                    <div class="sidebar-block">
+                        <div class="sidebar-label">Index of the Grimoire</div>
+                        <div class="sidebar-tags">
+                            <a href="#" class="tag">Heavy Metal</a>
+                            <a href="#" class="tag">Epic Metal</a>
+                            <a href="#" class="tag">Black Metal</a>
+                            <a href="#" class="tag">Dungeon Synth</a>
+                            <a href="#" class="tag">Vinyl</a>
+                            <a href="#" class="tag">Cassette</a>
+                            <a href="#" class="tag">OSR</a>
+                            <a href="#" class="tag">High Fantasy</a>
+                            <a href="#" class="tag">TTRPG</a>
+                            <a href="#" class="tag">Cult Classic</a>
+                            <a href="#" class="tag">Grimdark</a>
+                            <a href="#" class="tag">D&amp;D</a>
+                        </div>
+                    </div>
+                </aside>
+            </div>
+            <!-- /article-layout -->
+
+            <!-- More Reviews section -->
+            <div class="section-label">
+                <span class="section-label-text">More Reviews</span>
+                <div class="section-rule"></div>
+                <span class="section-ornament">✦</span>
+            </div>
+            <div class="card-grid">
+                <a href="#" class="card">
+                    <div class="card-num">II</div>
+                    <div class="card-cat">Tabletop · OSR</div>
+                    <div class="card-title">
+                        Cairn 2e — A Lean, Mean Dungeon Machine
+                    </div>
+                    <p class="card-body">
+                        Yochai Gal's second edition strips the dungeon to its
+                        bones and finds something essential underneath.
+                        Streamlined, brutal, and quietly brilliant.
+                    </p>
+                    <span class="card-date"
+                        >Feb MMXXVI ·
+                        <span class="rating"
+                            ><i class="fa-solid fa-dice-d20"></i
+                            ><i class="fa-solid fa-dice-d20"></i
+                            ><i class="fa-solid fa-dice-d20"></i
+                            ><i class="fa-solid fa-dice-d20"></i
+                            ><i class="fa-solid fa-dice-d20"></i></span
+                    ></span>
+                </a>
+                <a href="#" class="card">
+                    <div class="card-num">III</div>
+                    <div class="card-cat">Fantasy Fiction · Classic</div>
+                    <div class="card-title">
+                        Dragonlance — Chronicles Trilogy Revisited
+                    </div>
+                    <p class="card-body">
+                        Does it hold up? More than you'd think, and less than
+                        you hoped. But Raistlin remains one of the great
+                        character studies in the genre. Worth the return.
+                    </p>
+                    <span class="card-date"
+                        >Jan MMXXVI ·
+                        <span class="rating"
+                            ><i class="fa-solid fa-khanda"></i
+                            ><i class="fa-solid fa-khanda"></i
+                            ><i class="fa-solid fa-khanda"></i></span
+                    ></span>
+                </a>
+                <a href="#" class="card">
+                    <div class="card-num">IV</div>
+                    <div class="card-cat">Tabletop · RPG</div>
+                    <div class="card-title">
+                        Pathfinder 2e — Rage of Elements
+                    </div>
+                    <p class="card-body">
+                        A hefty sourcebook that earns its page count.
+                        Kineticists are now the most fun class in the game, full
+                        stop. If you're running a Pathfinder table, this is not
+                        optional.
+                    </p>
+                    <span class="card-date"
+                        >Feb MMXXVI ·
+                        <span class="rating"
+                            ><i class="fa-solid fa-dice-d20"></i
+                            ><i class="fa-solid fa-dice-d20"></i
+                            ><i class="fa-solid fa-dice-d20"></i
+                            ><i class="fa-solid fa-dice-d20"></i></span
+                    ></span>
+                </a>
+            </div>
+        </main>
+
+        <!-- ════════════════════════════════════════
+     FOOTER
+════════════════════════════════════════ -->
+        <footer>
+            <svg
+                class="footer-sigil-svg"
+                viewBox="0 0 200 150"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+            >
+                <circle
+                    cx="100"
+                    cy="75"
+                    r="66"
+                    stroke="var(--red)"
+                    stroke-width="1"
+                    fill="none"
+                    opacity="0.35"
+                />
+                <circle
+                    cx="100"
+                    cy="75"
+                    r="60"
+                    stroke="#e8e0cc"
+                    stroke-width="0.6"
+                    fill="none"
+                    opacity="0.2"
+                />
+                <path
+                    d="M100 8 L104 15 L100 22 L96 15 Z"
+                    fill="var(--red)"
+                    opacity="0.7"
+                />
+                <path
+                    d="M100 128 L104 135 L100 142 L96 135 Z"
+                    fill="var(--red)"
+                    opacity="0.7"
+                />
+                <path
+                    d="M33 75 L40 71 L47 75 L40 79 Z"
+                    fill="var(--red)"
+                    opacity="0.7"
+                />
+                <path
+                    d="M153 75 L160 71 L167 75 L160 79 Z"
+                    fill="var(--red)"
+                    opacity="0.7"
+                />
+                <text
+                    x="100"
+                    y="103"
+                    font-family="UnifrakturMaguntia, cursive"
+                    font-size="72"
+                    fill="var(--white)"
+                    text-anchor="middle"
+                    opacity="0.9"
+                    letter-spacing="-4"
+                >
+                    WP
+                </text>
+                <line
+                    x1="46"
+                    y1="112"
+                    x2="154"
+                    y2="112"
+                    stroke="var(--red)"
+                    stroke-width="0.8"
+                    opacity="0.5"
+                />
+            </svg>
+            <div class="foot-title">Wyrmwood Palisades</div>
+            <div class="foot-sub">
+                Epic Music · High Fantasy · Tabletop RPGs · Vol. I · MMXXVI
+            </div>
+            <div class="foot-copy">
+                © MMXXVI · All Rights Reserved · For Rogues, Riff-Lords, and
+                Realm-Seekers
+            </div>
+        </footer>
+
+        <!-- Theme toggle -->
+        <button
+            class="theme-toggle"
+            onclick="toggleTheme()"
+            aria-label="Toggle theme"
+        >
+            <span class="theme-toggle-icon" id="toggle-icon">☀</span>
+            <span id="toggle-label">Light Mode</span>
+        </button>
+
+        <script>
+            function toggleNav() {
+                const nav = document.getElementById("header-nav");
+                const btn = document.getElementById("hamburger");
+                nav.classList.toggle("open");
+                btn.classList.toggle("open");
+            }
+
+            function toggleTheme() {
+                const html = document.documentElement;
+                const isLight = html.getAttribute("data-theme") === "light";
+                html.setAttribute("data-theme", isLight ? "dark" : "light");
+                document.getElementById("toggle-icon").textContent = isLight
+                    ? "☀"
+                    : "☽";
+                document.getElementById("toggle-label").textContent = isLight
+                    ? "Light Mode"
+                    : "Dark Mode";
+            }
+        </script>
+    </body>
+</html>

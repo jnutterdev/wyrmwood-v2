@@ -1,0 +1,1233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Archive · Wyrmwood Palisades</title>
+<link href="https://fonts.googleapis.com/css2?family=UnifrakturMaguntia&family=MedievalSharp&family=Cinzel:wght@400;600;700;900&family=Cinzel+Decorative:wght@400;700&family=IM+Fell+English:ital@0;1&family=Crimson+Pro:ital,wght@0,400;0,600;1,400;1,600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+<style>
+  /* ══════════════════════════════
+     TOKENS
+  ══════════════════════════════ */
+  :root {
+    --black:      #1e1e1e;
+    --near-black: #272624;
+    --red:        #c4947a;
+    --red-dim:    #6b5248;
+    --red-pale:   #e8b89a;
+    --red-wash:   rgba(196,148,122,0.1);
+    --white:      #e8e0cc;
+    --white-dim:  #9a9080;
+    --panel-bg:   #222120;
+    --teal:       #4a7070;
+    --teal-lt:    #8ab4b0;
+    --amber:      #c8a878;
+    --rust:       #a07060;
+  }
+
+  [data-theme="light"] {
+    --black:      #f0e8d8;
+    --near-black: #e4d8c4;
+    --red:        #8a4a30;
+    --red-dim:    #b07858;
+    --red-pale:   #6a3820;
+    --red-wash:   rgba(138,74,48,0.08);
+    --white:      #3a3028;
+    --white-dim:  #6a5e50;
+    --panel-bg:   #e8ddc8;
+    --teal:       #7a3a28;
+    --teal-lt:    #9a4a32;
+    --amber:      #7a4e28;
+    --rust:       #9a5838;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--black);
+    color: var(--white);
+    font-family: 'IM Fell English', Georgia, serif;
+    overflow-x: hidden;
+    min-height: 100vh;
+  }
+
+  /* ══════════════════════════════
+     HEADER
+  ══════════════════════════════ */
+  header {
+    border-bottom: 1px solid var(--red-dim);
+    position: relative; overflow: hidden;
+  }
+
+  .top-bar {
+    background: var(--near-black);
+    border-bottom: 1px solid var(--red-dim);
+    padding: 6px 28px;
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  .top-bar-label {
+    font-family: 'Cinzel', serif;
+    font-size: 0.6rem; letter-spacing: 0.35em;
+    text-transform: uppercase; color: var(--white-dim);
+    display: flex; align-items: center; gap: 12px;
+  }
+  .top-bar-label::before {
+    content: '';
+    display: inline-block; width: 6px; height: 6px;
+    border: 1px solid var(--red-dim); transform: rotate(45deg);
+  }
+  .top-bar-num {
+    font-family: 'Cinzel', serif;
+    font-size: 0.65rem; letter-spacing: 0.2em;
+    color: var(--red-pale);
+    border: 1px solid var(--red-dim);
+    padding: 2px 8px;
+  }
+
+  .header-body {
+    padding: 32px 36px 0;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 24px;
+    align-items: start;
+    position: relative; z-index: 2;
+  }
+  .header-body::before {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+    background:
+      radial-gradient(ellipse 65% 80% at 25% 50%, rgba(138,180,176,0.12) 0%, transparent 60%),
+      radial-gradient(ellipse 45% 60% at 85% 35%, rgba(200,168,120,0.1) 0%, transparent 55%);
+    pointer-events: none;
+  }
+
+  .site-title {
+    font-family: 'UnifrakturMaguntia', cursive;
+    font-size: clamp(4rem, 13vw, 9rem);
+    line-height: 0.88;
+    color: var(--white);
+    letter-spacing: 0.02em;
+    text-shadow:
+      2px 2px 0   rgba(0,0,0,0.25),
+      0   0   30px rgba(196,148,122,0.12),
+      1px 0   0   rgba(196,148,122,0.15);
+    animation: revealDown 0.8s cubic-bezier(0.16,1,0.3,1) both;
+    position: relative;
+  }
+
+  .header-nav-block {
+    display: none;
+    flex-direction: column;
+    border: 1px solid var(--red-dim);
+    align-self: start; margin-top: 4px;
+    animation: fadeIn 0.8s ease 0.3s both;
+  }
+  .header-nav-block a {
+    font-family: 'Cinzel', serif;
+    font-size: 0.68rem; letter-spacing: 0.22em;
+    text-transform: uppercase; color: var(--white-dim);
+    text-decoration: none; padding: 9px 18px;
+    border-bottom: 1px solid var(--red-dim);
+    transition: background 0.2s, color 0.2s; white-space: nowrap;
+  }
+  .header-nav-block a:last-child { border-bottom: none; }
+  .header-nav-block a:hover { background: var(--red-dim); color: var(--white); }
+
+  .hamburger {
+    display: none;
+    flex-direction: column; justify-content: center; gap: 5px;
+    width: 36px; height: 36px;
+    background: none; border: 1px solid var(--red-dim);
+    cursor: pointer; padding: 8px;
+    align-self: start; margin-top: 4px; transition: background 0.2s;
+  }
+  .hamburger:hover { background: var(--red-wash); }
+  .hamburger span {
+    display: block; width: 100%; height: 1px;
+    background: var(--white-dim); transition: transform 0.2s, opacity 0.2s;
+  }
+  .hamburger.open span:nth-child(1) { transform: translateY(6px) rotate(45deg); }
+  .hamburger.open span:nth-child(2) { opacity: 0; }
+  .hamburger.open span:nth-child(3) { transform: translateY(-6px) rotate(-45deg); }
+
+  @media (max-width: 640px) {
+    .hamburger { display: flex; }
+    .header-nav-block.open {
+      display: flex;
+      position: absolute; top: 55%; right: 0;
+      background: var(--near-black); z-index: 100;
+      border: 1px solid var(--red-dim); min-width: 160px;
+    }
+    .sub-nav { display: none !important; }
+    header { border-bottom: none; }
+  }
+
+  .header-tagline {
+    padding: 14px 36px 24px;
+    font-family: 'IM Fell English', Georgia, serif;
+    font-style: italic; font-size: 1rem;
+    color: var(--white-dim); line-height: 1.7;
+    max-width: 540px; animation: fadeIn 0.8s ease 0.2s both;
+    letter-spacing: 0.02em;
+  }
+
+  .sub-nav {
+    border-top: 1px solid var(--red-dim);
+    display: none; overflow: hidden; align-items: center;
+    animation: fadeIn 0.8s ease 0.4s both;
+  }
+  @media (min-width: 641px) { .sub-nav { display: flex; } }
+
+  .sub-nav a {
+    font-family: 'Cinzel', serif;
+    font-size: 0.62rem; letter-spacing: 0.28em;
+    text-transform: uppercase; color: var(--white-dim);
+    text-decoration: none; padding: 10px 20px;
+    border-right: 1px solid var(--red-dim);
+    transition: color 0.2s, background 0.2s;
+    display: flex; align-items: center;
+  }
+  .sub-nav a:hover { color: var(--white); background: var(--red-wash); }
+  .sub-nav a.active { color: var(--teal-lt); }
+  .sub-nav .spacer { flex: 1; }
+  .sub-nav .issue {
+    font-family: 'IM Fell English', serif;
+    font-style: italic; font-size: 0.72rem;
+    color: var(--red-dim); display: flex; align-items: center;
+    padding: 0 20px;
+  }
+
+  /* ══════════════════════════════
+     PAGE WRAP
+  ══════════════════════════════ */
+  .page-wrap {
+    max-width: 1020px; margin: 0 auto;
+    padding: 40px 36px 60px;
+    position: relative; z-index: 2;
+    animation: revealUp 0.7s ease 0.45s both;
+  }
+
+  /* ══════════════════════════════
+     SHARED COMPONENTS
+  ══════════════════════════════ */
+  .tag {
+    font-family: 'Cinzel', serif;
+    font-size: 0.58rem; letter-spacing: 0.15em;
+    text-transform: uppercase; color: var(--white-dim);
+    border: 1px solid var(--red-dim);
+    padding: 3px 9px; text-decoration: none;
+    transition: all 0.2s; display: inline-block;
+  }
+  .tag:hover { background: var(--red-dim); color: var(--white); }
+
+  .rating { display: inline-flex; gap: 3px; vertical-align: middle; margin-left: 2px; }
+  .rating i { font-size: 0.62rem; color: var(--amber); opacity: 0.85; }
+
+  /* ══════════════════════════════
+     FOOTER
+  ══════════════════════════════ */
+  footer {
+    border-top: 1px solid var(--red-dim);
+    background: var(--near-black);
+    text-align: center; padding: 32px 28px 28px;
+    position: relative; z-index: 2;
+  }
+  .footer-sigil-svg {
+    width: 200px; height: 150px;
+    margin: 0 auto 14px; display: block;
+    opacity: 0.55; filter: drop-shadow(0 0 18px rgba(232,224,204,0.08));
+  }
+  .foot-title {
+    font-family: 'UnifrakturMaguntia', cursive;
+    font-size: 2.8rem; color: var(--white);
+    text-shadow: 1px 1px 0 rgba(0,0,0,0.25), 0 0 30px rgba(196,148,122,0.15), 0 0 60px rgba(138,180,176,0.1);
+    letter-spacing: 0.02em; margin-bottom: 6px;
+  }
+  .foot-sub {
+    font-family: 'Cinzel', serif;
+    font-size: 0.58rem; letter-spacing: 0.35em;
+    text-transform: uppercase; color: var(--red-dim); margin-bottom: 4px;
+  }
+  .foot-copy {
+    font-family: 'IM Fell English', serif;
+    font-style: italic; font-size: 0.72rem;
+    color: var(--white-dim); opacity: 0.3;
+  }
+
+  /* ══════════════════════════════
+     THEME TOGGLE
+  ══════════════════════════════ */
+  .theme-toggle {
+    position: fixed; bottom: 24px; right: 24px; z-index: 999;
+    background: var(--near-black); border: 1px solid var(--red-dim);
+    color: var(--white-dim); font-family: 'Cinzel', serif;
+    font-size: 0.58rem; letter-spacing: 0.22em; text-transform: uppercase;
+    padding: 8px 14px; cursor: pointer;
+    transition: background 0.2s, color 0.2s, border-color 0.2s;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .theme-toggle:hover { background: var(--red-dim); color: var(--white); }
+  .theme-toggle-icon { font-size: 0.9rem; line-height: 1; }
+
+  /* ══════════════════════════════
+     ANIMATIONS
+  ══════════════════════════════ */
+  @keyframes revealDown {
+    from { opacity: 0; transform: translateY(-18px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes revealUp {
+    from { opacity: 0; transform: translateY(18px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+  }
+
+  /* ══════════════════════════════
+     LIGHT MODE OVERRIDES
+  ══════════════════════════════ */
+  [data-theme="light"] .header-body::before {
+    background:
+      radial-gradient(ellipse 65% 80% at 25% 50%, rgba(80,120,110,0.08) 0%, transparent 60%),
+      radial-gradient(ellipse 45% 60% at 85% 35%, rgba(160,100,70,0.07) 0%, transparent 55%);
+  }
+  [data-theme="light"] .foot-title {
+    text-shadow: 1px 1px 0 rgba(255,255,255,0.3), 0 0 20px rgba(138,74,48,0.08);
+  }
+  [data-theme="light"] .archive-stat-block { border-color: var(--red-dim); }
+  [data-theme="light"] .stat-cell { border-color: var(--red-dim); }
+  [data-theme="light"] .archive-entry.featured { background: rgba(138,74,48,0.04); }
+  [data-theme="light"] .archive-entry.featured:hover { background: rgba(138,74,48,0.08); }
+  [data-theme="light"] .filter-tab.active { border-bottom-color: var(--teal-lt); }
+
+
+  /* ══════════════════════════════════════════
+     ARCHIVE — BANNER
+  ══════════════════════════════════════════ */
+  .archive-banner {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 28px;
+    padding-bottom: 28px;
+    margin-bottom: 28px;
+    border-bottom: 1px solid var(--red-dim);
+    flex-wrap: wrap;
+  }
+
+  .archive-banner-text { flex: 1; min-width: 240px; }
+
+  .archive-kicker {
+    font-family: 'Cinzel', serif;
+    font-size: 0.6rem; letter-spacing: 0.38em;
+    text-transform: uppercase; color: var(--teal-lt);
+    margin-bottom: 10px;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .archive-kicker::after { content: ''; width: 40px; height: 1px; background: var(--red-dim); }
+
+  .archive-title {
+    font-family: 'UnifrakturMaguntia', cursive;
+    font-size: clamp(2.2rem, 5vw, 3.4rem);
+    color: var(--teal-lt);
+    line-height: 1;
+    text-shadow: 1px 1px 0 rgba(0,0,0,0.2), 0 0 20px rgba(138,180,176,0.2);
+    margin-bottom: 14px;
+    letter-spacing: 0.02em;
+  }
+
+  .archive-desc {
+    font-family: 'IM Fell English', serif;
+    font-style: italic; font-size: 0.92rem;
+    line-height: 1.82; color: var(--white-dim);
+    max-width: 480px;
+  }
+
+  /* Stat block — three bordered cells */
+  .archive-stat-block {
+    display: flex;
+    border: 1px solid var(--red-dim);
+    align-self: flex-start;
+    flex-shrink: 0;
+    background: var(--panel-bg);
+    box-shadow: inset 0 0 0 4px var(--panel-bg), inset 0 0 0 5px var(--red-dim);
+  }
+  .stat-cell {
+    padding: 16px 22px;
+    border-right: 1px solid var(--red-dim);
+    text-align: center;
+  }
+  .stat-cell:last-child { border-right: none; }
+  .stat-num {
+    font-family: 'Cinzel Decorative', serif;
+    font-size: 1.6rem; font-weight: 700;
+    color: var(--red-pale);
+    text-shadow: 1px 1px 0 rgba(0,0,0,0.2);
+    line-height: 1; display: block; margin-bottom: 5px;
+  }
+  .stat-icon {
+    font-size: 0.65rem; color: var(--amber);
+    display: block; margin-bottom: 5px;
+  }
+  .stat-label {
+    font-family: 'Cinzel', serif;
+    font-size: 0.52rem; letter-spacing: 0.3em;
+    text-transform: uppercase; color: var(--white-dim);
+    white-space: nowrap;
+  }
+
+  /* ══════════════════════════════════════════
+     ARCHIVE — TWO-COLUMN LAYOUT
+  ══════════════════════════════════════════ */
+  .archive-layout {
+    display: grid;
+    grid-template-columns: 1fr 268px;
+    gap: 28px;
+    align-items: start;
+  }
+  @media (max-width: 800px) {
+    .archive-layout { grid-template-columns: 1fr; }
+  }
+
+  /* ══════════════════════════════════════════
+     ARCHIVE — FILTER BAR
+  ══════════════════════════════════════════ */
+  .filter-bar {
+    display: flex;
+    background: var(--near-black);
+    border: 1px solid var(--red-dim);
+    border-bottom: none;
+    overflow: hidden;
+    flex-wrap: wrap;
+  }
+  .filter-tab {
+    font-family: 'Cinzel', serif;
+    font-size: 0.6rem; letter-spacing: 0.28em;
+    text-transform: uppercase; color: var(--white-dim);
+    padding: 10px 18px;
+    border-right: 1px solid var(--red-dim);
+    cursor: pointer; background: none; border-top: none; border-bottom: 2px solid transparent;
+    transition: background 0.2s, color 0.2s, border-bottom-color 0.2s;
+    display: flex; align-items: center; gap: 7px;
+    text-decoration: none;
+  }
+  .filter-tab:last-child { border-right: none; }
+  .filter-tab:hover { background: var(--red-wash); color: var(--white); }
+  .filter-tab.active { color: var(--teal-lt); border-bottom-color: var(--teal-lt); }
+  .filter-tab i { font-size: 0.6rem; color: var(--amber); }
+  .filter-count {
+    font-family: 'Cinzel', serif;
+    font-size: 0.5rem; letter-spacing: 0.1em;
+    color: var(--white-dim); opacity: 0.6;
+    padding: 1px 5px; border: 1px solid var(--red-dim);
+  }
+  .filter-tab.active .filter-count { border-color: var(--teal-lt); color: var(--teal-lt); opacity: 0.8; }
+
+  /* ══════════════════════════════════════════
+     ARCHIVE — LIST CONTAINER
+  ══════════════════════════════════════════ */
+  .archive-list {
+    border: 1px solid var(--red-dim);
+    border-bottom: none; /* pagination closes it */
+  }
+
+  /* ── Year divider ── */
+  .year-divider {
+    display: flex; align-items: center; gap: 14px;
+    padding: 10px 20px;
+    background: var(--near-black);
+    border-bottom: 1px solid var(--red-dim);
+  }
+  .year-divider-rule { flex: 1; height: 1px; background: var(--red-dim); opacity: 0.5; }
+  .year-divider-label {
+    font-family: 'UnifrakturMaguntia', cursive;
+    font-size: 1.3rem; color: var(--red-dim);
+    text-shadow: 1px 1px 0 rgba(0,0,0,0.15);
+    letter-spacing: 0.04em; line-height: 1;
+  }
+  .year-divider-count {
+    font-family: 'Cinzel', serif;
+    font-size: 0.5rem; letter-spacing: 0.25em;
+    text-transform: uppercase; color: var(--white-dim); opacity: 0.45;
+  }
+
+  /* ── Entry shared ── */
+  .archive-entry {
+    display: block; text-decoration: none; color: inherit;
+    border-bottom: 1px solid var(--red-dim);
+    transition: background 0.2s;
+    position: relative;
+  }
+  .archive-entry:last-child { border-bottom: none; }
+  .archive-entry:hover { background: rgba(196,148,122,0.04); }
+
+  .entry-num {
+    font-family: 'Cinzel', serif;
+    font-weight: 700; color: rgba(196,148,122,0.28);
+    letter-spacing: 0.05em; line-height: 1;
+    flex-shrink: 0; user-select: none;
+  }
+
+  .entry-cat {
+    font-family: 'Cinzel', serif;
+    font-size: 0.54rem; letter-spacing: 0.28em;
+    text-transform: uppercase; color: var(--teal-lt);
+    display: inline-flex; align-items: center; gap: 5px;
+    white-space: nowrap; flex-shrink: 0;
+  }
+  .entry-cat i { font-size: 0.56rem; color: var(--amber); }
+
+  /* ── Featured entry ── */
+  .archive-entry.featured {
+    padding: 22px 22px 18px;
+    background: rgba(196,148,122,0.025);
+    border-left: 2px solid var(--red-dim);
+  }
+  .archive-entry.featured:hover { background: rgba(196,148,122,0.055); }
+
+  .featured-top {
+    display: flex; align-items: baseline; gap: 14px;
+    margin-bottom: 8px;
+  }
+  .featured-top .entry-num { font-size: 1.2rem; }
+
+  .featured-badge {
+    font-family: 'Cinzel', serif;
+    font-size: 0.48rem; letter-spacing: 0.3em;
+    text-transform: uppercase; color: var(--red-pale);
+    border: 1px solid var(--red-dim); padding: 2px 7px;
+    margin-left: auto; flex-shrink: 0;
+  }
+
+  .entry-title-featured {
+    font-family: 'Cinzel Decorative', serif;
+    font-size: 1.05rem; font-weight: 700; line-height: 1.2;
+    letter-spacing: 0.01em; color: var(--white);
+    text-shadow: 1px 1px 0 rgba(0,0,0,0.2), 0 0 14px rgba(138,180,176,0.07);
+    margin-bottom: 3px;
+  }
+
+  .entry-sub-cat {
+    margin-bottom: 10px;
+  }
+
+  .entry-excerpt {
+    font-family: 'IM Fell English', serif;
+    font-style: italic; font-size: 0.88rem;
+    line-height: 1.8; color: var(--white-dim);
+    margin-bottom: 14px;
+  }
+
+  .entry-meta-row {
+    display: flex; align-items: center; gap: 14px;
+    flex-wrap: wrap;
+  }
+  .entry-date {
+    font-family: 'IM Fell English', serif;
+    font-style: italic; font-size: 0.72rem;
+    color: var(--amber);
+  }
+  .entry-read {
+    font-family: 'Cinzel', serif;
+    font-size: 0.56rem; letter-spacing: 0.25em;
+    text-transform: uppercase; color: var(--black);
+    background: var(--white); text-decoration: none;
+    padding: 5px 14px; border: 1px solid var(--white);
+    transition: background 0.2s, color 0.2s, border-color 0.2s;
+    margin-left: auto;
+  }
+  .entry-read:hover { background: var(--red-dim); border-color: var(--red-dim); color: var(--white); }
+
+  /* ── Compact entry ── */
+  .archive-entry.compact {
+    display: flex; align-items: center;
+    gap: 0; padding: 0;
+    border-bottom: 1px solid rgba(196,148,122,0.15);
+  }
+  .archive-entry.compact:hover { background: rgba(196,148,122,0.04); }
+
+  .compact-num {
+    font-family: 'Cinzel', serif;
+    font-size: 0.75rem; font-weight: 700;
+    color: rgba(196,148,122,0.3);
+    letter-spacing: 0.06em;
+    padding: 12px 0 12px 20px;
+    width: 52px; flex-shrink: 0;
+    line-height: 1;
+  }
+  .compact-cat-col {
+    width: 120px; flex-shrink: 0;
+    padding: 12px 10px;
+    border-left: 1px solid rgba(196,148,122,0.12);
+    border-right: 1px solid rgba(196,148,122,0.12);
+  }
+  .compact-body {
+    flex: 1; min-width: 0;
+    padding: 12px 16px;
+  }
+  .compact-title {
+    font-family: 'Crimson Pro', serif;
+    font-size: 0.93rem; font-weight: 600;
+    color: var(--white); line-height: 1.3;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .compact-meta-col {
+    padding: 12px 20px 12px 10px;
+    display: flex; align-items: center; gap: 8px;
+    flex-shrink: 0;
+    border-left: 1px solid rgba(196,148,122,0.12);
+  }
+  .compact-date {
+    font-family: 'IM Fell English', serif;
+    font-style: italic; font-size: 0.68rem;
+    color: var(--amber); white-space: nowrap;
+  }
+
+  @media (max-width: 640px) {
+    .archive-entry.compact { flex-wrap: wrap; }
+    .compact-cat-col { border: none; width: auto; padding-left: 0; padding-top: 0; }
+    .compact-body { padding-top: 0; padding-left: 10px; width: calc(100% - 52px); flex-basis: 100%; }
+    .compact-meta-col { border: none; padding-left: 52px; padding-top: 0; }
+    .compact-title { white-space: normal; }
+  }
+
+  /* ══════════════════════════════════════════
+     ARCHIVE — PAGINATION
+  ══════════════════════════════════════════ */
+  .pagination {
+    display: flex; align-items: stretch;
+    border: 1px solid var(--red-dim);
+    background: var(--near-black);
+    overflow: hidden; flex-wrap: wrap;
+  }
+  .page-btn {
+    font-family: 'Cinzel', serif;
+    font-size: 0.6rem; letter-spacing: 0.2em;
+    text-transform: uppercase; color: var(--white-dim);
+    padding: 10px 16px;
+    border-right: 1px solid var(--red-dim);
+    text-decoration: none; cursor: pointer;
+    transition: background 0.2s, color 0.2s;
+    display: flex; align-items: center; justify-content: center;
+    background: none; white-space: nowrap;
+  }
+  .page-btn:last-child { border-right: none; }
+  .page-btn:hover { background: var(--red-wash); color: var(--white); }
+  .page-btn.active { color: var(--teal-lt); background: rgba(138,180,176,0.06); }
+  .page-btn.disabled { color: var(--white-dim); opacity: 0.3; pointer-events: none; }
+  .page-btn.ellipsis { color: var(--red-dim); letter-spacing: 0.05em; cursor: default; }
+  .page-btn.ellipsis:hover { background: none; color: var(--red-dim); }
+  .page-spacer { flex: 1; border-right: 1px solid var(--red-dim); }
+  .page-summary {
+    font-family: 'IM Fell English', serif;
+    font-style: italic; font-size: 0.72rem;
+    color: var(--white-dim); opacity: 0.5;
+    padding: 10px 18px;
+    display: flex; align-items: center;
+  }
+
+  /* ══════════════════════════════════════════
+     ARCHIVE — SIDEBAR
+  ══════════════════════════════════════════ */
+  .archive-sidebar {
+    display: flex; flex-direction: column;
+    border: 1px solid var(--red-dim);
+    position: sticky; top: 24px;
+  }
+  .sidebar-block {
+    border-bottom: 1px solid var(--red-dim);
+    padding: 18px 18px 16px;
+  }
+  .sidebar-block:last-child { border-bottom: none; }
+
+  .sidebar-label {
+    font-family: 'Cinzel', serif;
+    font-size: 0.58rem; letter-spacing: 0.3em;
+    text-transform: uppercase; color: var(--teal-lt);
+    margin-bottom: 14px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .sidebar-label::after { content: ''; flex: 1; height: 1px; background: var(--red-dim); }
+
+  /* Browse by category */
+  .browse-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 9px 0;
+    border-bottom: 1px solid rgba(196,148,122,0.12);
+    text-decoration: none; color: inherit;
+    transition: opacity 0.2s;
+  }
+  .browse-item:last-child { border-bottom: none; padding-bottom: 0; }
+  .browse-item:hover { opacity: 0.75; }
+  .browse-item i { font-size: 0.7rem; color: var(--amber); width: 14px; text-align: center; flex-shrink: 0; }
+  .browse-name {
+    font-family: 'Cinzel', serif;
+    font-size: 0.62rem; letter-spacing: 0.2em;
+    text-transform: uppercase; color: var(--white);
+    flex: 1;
+  }
+  .browse-item.all-item .browse-name { color: var(--teal-lt); }
+  .browse-count {
+    font-family: 'Cinzel Decorative', serif;
+    font-size: 0.78rem; font-weight: 700;
+    color: rgba(196,148,122,0.45);
+    letter-spacing: 0.05em;
+  }
+  .browse-bar {
+    height: 2px; background: var(--red-dim); opacity: 0.35;
+    margin-top: 4px; border-radius: 0;
+  }
+
+  /* Browse by year */
+  .year-item {
+    display: flex; align-items: baseline; gap: 10px;
+    padding: 8px 0;
+    border-bottom: 1px solid rgba(196,148,122,0.12);
+    text-decoration: none; color: inherit;
+    transition: opacity 0.2s;
+  }
+  .year-item:last-child { border-bottom: none; padding-bottom: 0; }
+  .year-item:hover { opacity: 0.75; }
+  .year-label {
+    font-family: 'UnifrakturMaguntia', cursive;
+    font-size: 1.1rem; color: var(--white-dim);
+    line-height: 1; letter-spacing: 0.03em;
+  }
+  .year-item:first-child .year-label { color: var(--white); }
+  .year-count {
+    font-family: 'Cinzel', serif;
+    font-size: 0.54rem; letter-spacing: 0.2em;
+    text-transform: uppercase; color: var(--white-dim); opacity: 0.55;
+  }
+  .year-spacer { flex: 1; }
+  .year-bar-wrap { width: 48px; }
+  .year-bar {
+    height: 2px; background: var(--red-dim); opacity: 0.4;
+  }
+
+  /* Sidebar tag cloud */
+  .sidebar-tags { display: flex; flex-wrap: wrap; gap: 5px; }
+</style>
+</head>
+<body>
+
+<!-- ════════════════════════════════════════
+     HEADER
+════════════════════════════════════════ -->
+<header>
+  <div class="top-bar">
+    <div class="top-bar-label">For Rogues, Riff-Lords, and Realm-Seekers</div>
+    <div class="top-bar-num">Vol. I · XII</div>
+  </div>
+
+  <div class="header-body">
+    <div>
+      <h1 class="site-title">Wyrmwood<br>Palisades</h1>
+    </div>
+    <button class="hamburger" id="hamburger" aria-label="Toggle navigation" onclick="toggleNav()">
+      <span></span><span></span><span></span>
+    </button>
+    <nav class="header-nav-block" id="header-nav">
+      <a href="#">All Reviews</a>
+      <a href="#">Music</a>
+      <a href="#">Fiction</a>
+      <a href="#">Tabletop</a>
+      <a href="#">Spotlight</a>
+      <a href="#">About</a>
+    </nav>
+  </div>
+
+  <p class="header-tagline">Reviews of epic music, high fantasy fiction, and tabletop RPGs — for anyone who has argued about the best fantasy novel, worn out a cassette tape, or rolled dice until midnight . . .</p>
+
+  <nav class="sub-nav">
+    <a href="#">All Reviews</a>
+    <a href="#">Music</a>
+    <a href="#">Fiction</a>
+    <a href="#">Tabletop</a>
+    <a href="#">Spotlight</a>
+    <a href="#" class="active">Archive</a>
+    <div class="spacer"></div>
+    <div class="issue">March Spotlight</div>
+  </nav>
+</header>
+
+<!-- ════════════════════════════════════════
+     MAIN
+════════════════════════════════════════ -->
+<main class="page-wrap">
+
+  <!-- ── Archive Banner ── -->
+  <div class="archive-banner">
+
+    <div class="archive-banner-text">
+      <div class="archive-kicker">⚔ Complete Index</div>
+      <h1 class="archive-title">The Archive</h1>
+      <p class="archive-desc">A complete chronicle of every review published in these palisades — catalogued in reverse order of discovery. Filter by discipline, or use the sidebar to navigate by year or subject matter.</p>
+    </div>
+
+    <div class="archive-stat-block" aria-label="Review counts by category">
+      <div class="stat-cell">
+        <span class="stat-icon"><i class="fa-solid fa-skull"></i></span>
+        <span class="stat-num">14</span>
+        <span class="stat-label">Music</span>
+      </div>
+      <div class="stat-cell">
+        <span class="stat-icon"><i class="fa-solid fa-khanda"></i></span>
+        <span class="stat-num">10</span>
+        <span class="stat-label">Fiction</span>
+      </div>
+      <div class="stat-cell">
+        <span class="stat-icon"><i class="fa-solid fa-dice-d20"></i></span>
+        <span class="stat-num">8</span>
+        <span class="stat-label">Tabletop</span>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ── Two-column layout ── -->
+  <div class="archive-layout">
+
+    <!-- ════════════ LISTINGS COLUMN ════════════ -->
+    <div class="archive-col">
+
+      <!-- Filter bar -->
+      <nav class="filter-bar" aria-label="Filter reviews by category">
+        <a href="#" class="filter-tab active">
+          ◆ All <span class="filter-count">32</span>
+        </a>
+        <a href="#" class="filter-tab">
+          <i class="fa-solid fa-skull"></i> Music <span class="filter-count">14</span>
+        </a>
+        <a href="#" class="filter-tab">
+          <i class="fa-solid fa-khanda"></i> Fiction <span class="filter-count">10</span>
+        </a>
+        <a href="#" class="filter-tab">
+          <i class="fa-solid fa-dice-d20"></i> Tabletop <span class="filter-count">8</span>
+        </a>
+      </nav>
+
+      <!-- Archive list -->
+      <div class="archive-list" role="list">
+
+        <!-- ══ MMXXVI ══ -->
+        <div class="year-divider" role="separator">
+          <div class="year-divider-rule"></div>
+          <span class="year-divider-label">MMXXVI</span>
+          <div class="year-divider-rule"></div>
+          <span class="year-divider-count">12 entries</span>
+        </div>
+
+        <!-- Featured I -->
+        <a href="#" class="archive-entry featured" role="listitem">
+          <div class="featured-top">
+            <span class="entry-num">I</span>
+            <span class="entry-cat"><i class="fa-solid fa-dice-d20"></i> Tabletop · Monthly Spotlight</span>
+            <span class="featured-badge">Spotlight</span>
+          </div>
+          <div class="entry-title-featured">The Dark Grimoire of Hex & Hum</div>
+          <div class="entry-sub-cat"></div>
+          <p class="entry-excerpt">When the suns of the old world drowned in ash, the dungeon remained. Old-school RPGs and the soundtracks that haunt them — on the particular silence between turns, the slow turning of graph paper, and music as prophecy rendered in halftone and hiss.</p>
+          <div class="entry-meta-row">
+            <span class="entry-date">March MMXXVI</span>
+            <span class="rating">
+              <i class="fa-solid fa-dice-d20"></i><i class="fa-solid fa-dice-d20"></i>
+              <i class="fa-solid fa-dice-d20"></i><i class="fa-solid fa-dice-d20"></i>
+              <i class="fa-solid fa-dice-d20"></i>
+            </span>
+            <a href="#" class="entry-read" onclick="return false;">Read the Review</a>
+          </div>
+        </a>
+
+        <!-- Featured II -->
+        <a href="#" class="archive-entry featured" role="listitem">
+          <div class="featured-top">
+            <span class="entry-num">II</span>
+            <span class="entry-cat"><i class="fa-solid fa-skull"></i> Music · Heavy Metal</span>
+          </div>
+          <div class="entry-title-featured">Manilla Road — Crystal Logic</div>
+          <div class="entry-sub-cat"></div>
+          <p class="entry-excerpt">Released in 1983 to little commercial notice, <em>Crystal Logic</em> has spent the decades since becoming one of the most quietly essential texts in the heavy underground — a record that every serious listener eventually stumbles across, usually alone, usually late.</p>
+          <div class="entry-meta-row">
+            <span class="entry-date">March MMXXVI</span>
+            <span class="rating">
+              <i class="fa-solid fa-skull"></i><i class="fa-solid fa-skull"></i>
+              <i class="fa-solid fa-skull"></i><i class="fa-solid fa-skull"></i>
+              <i class="fa-solid fa-skull"></i>
+            </span>
+            <a href="#" class="entry-read" onclick="return false;">Read the Review</a>
+          </div>
+        </a>
+
+        <!-- Compact III -->
+        <a href="#" class="archive-entry compact" role="listitem">
+          <div class="compact-num">III</div>
+          <div class="compact-cat-col">
+            <span class="entry-cat"><i class="fa-solid fa-skull"></i> Music</span>
+          </div>
+          <div class="compact-body">
+            <span class="compact-title">Summoning — With Doom We Come</span>
+          </div>
+          <div class="compact-meta-col">
+            <span class="compact-date">Mar MMXXVI</span>
+            <span class="rating">
+              <i class="fa-solid fa-skull"></i><i class="fa-solid fa-skull"></i>
+              <i class="fa-solid fa-skull"></i><i class="fa-solid fa-skull"></i>
+              <i class="fa-solid fa-skull"></i>
+            </span>
+          </div>
+        </a>
+
+        <!-- Compact IV -->
+        <a href="#" class="archive-entry compact" role="listitem">
+          <div class="compact-num">IV</div>
+          <div class="compact-cat-col">
+            <span class="entry-cat"><i class="fa-solid fa-khanda"></i> Fiction</span>
+          </div>
+          <div class="compact-body">
+            <span class="compact-title">John Gwynne — A Time of Dread</span>
+          </div>
+          <div class="compact-meta-col">
+            <span class="compact-date">Mar MMXXVI</span>
+            <span class="rating">
+              <i class="fa-solid fa-khanda"></i><i class="fa-solid fa-khanda"></i>
+              <i class="fa-solid fa-khanda"></i><i class="fa-solid fa-khanda"></i>
+            </span>
+          </div>
+        </a>
+
+        <!-- Compact V -->
+        <a href="#" class="archive-entry compact" role="listitem">
+          <div class="compact-num">V</div>
+          <div class="compact-cat-col">
+            <span class="entry-cat"><i class="fa-solid fa-dice-d20"></i> Tabletop</span>
+          </div>
+          <div class="compact-body">
+            <span class="compact-title">Pathfinder 2e — Rage of Elements</span>
+          </div>
+          <div class="compact-meta-col">
+            <span class="compact-date">Feb MMXXVI</span>
+            <span class="rating">
+              <i class="fa-solid fa-dice-d20"></i><i class="fa-solid fa-dice-d20"></i>
+              <i class="fa-solid fa-dice-d20"></i><i class="fa-solid fa-dice-d20"></i>
+            </span>
+          </div>
+        </a>
+
+        <!-- Compact VI -->
+        <a href="#" class="archive-entry compact" role="listitem">
+          <div class="compact-num">VI</div>
+          <div class="compact-cat-col">
+            <span class="entry-cat"><i class="fa-solid fa-skull"></i> Music</span>
+          </div>
+          <div class="compact-body">
+            <span class="compact-title">Wolves in the Throne Room — Primordial Arcana (Limited Press)</span>
+          </div>
+          <div class="compact-meta-col">
+            <span class="compact-date">Feb MMXXVI</span>
+            <span class="rating">
+              <i class="fa-solid fa-skull"></i><i class="fa-solid fa-skull"></i>
+              <i class="fa-solid fa-skull"></i><i class="fa-solid fa-skull"></i>
+              <i class="fa-solid fa-skull"></i>
+            </span>
+          </div>
+        </a>
+
+        <!-- Compact VII -->
+        <a href="#" class="archive-entry compact" role="listitem">
+          <div class="compact-num">VII</div>
+          <div class="compact-cat-col">
+            <span class="entry-cat"><i class="fa-solid fa-dice-d20"></i> Tabletop</span>
+          </div>
+          <div class="compact-body">
+            <span class="compact-title">Cairn 2e — A Lean, Mean Dungeon Machine</span>
+          </div>
+          <div class="compact-meta-col">
+            <span class="compact-date">Feb MMXXVI</span>
+            <span class="rating">
+              <i class="fa-solid fa-dice-d20"></i><i class="fa-solid fa-dice-d20"></i>
+              <i class="fa-solid fa-dice-d20"></i><i class="fa-solid fa-dice-d20"></i>
+              <i class="fa-solid fa-dice-d20"></i>
+            </span>
+          </div>
+        </a>
+
+        <!-- Compact VIII -->
+        <a href="#" class="archive-entry compact" role="listitem">
+          <div class="compact-num">VIII</div>
+          <div class="compact-cat-col">
+            <span class="entry-cat"><i class="fa-solid fa-khanda"></i> Fiction</span>
+          </div>
+          <div class="compact-body">
+            <span class="compact-title">Dragonlance — Chronicles Trilogy Revisited</span>
+          </div>
+          <div class="compact-meta-col">
+            <span class="compact-date">Jan MMXXVI</span>
+            <span class="rating">
+              <i class="fa-solid fa-khanda"></i><i class="fa-solid fa-khanda"></i>
+              <i class="fa-solid fa-khanda"></i>
+            </span>
+          </div>
+        </a>
+
+        <!-- ══ MMXXV ══ -->
+        <div class="year-divider" role="separator">
+          <div class="year-divider-rule"></div>
+          <span class="year-divider-label">MMXXV</span>
+          <div class="year-divider-rule"></div>
+          <span class="year-divider-count">20 entries</span>
+        </div>
+
+        <!-- Compact IX -->
+        <a href="#" class="archive-entry compact" role="listitem">
+          <div class="compact-num">IX</div>
+          <div class="compact-cat-col">
+            <span class="entry-cat"><i class="fa-solid fa-skull"></i> Music</span>
+          </div>
+          <div class="compact-body">
+            <span class="compact-title">Caladan Brood — Echoes of Battle (Reissue)</span>
+          </div>
+          <div class="compact-meta-col">
+            <span class="compact-date">Dec MMXXV</span>
+            <span class="rating">
+              <i class="fa-solid fa-skull"></i><i class="fa-solid fa-skull"></i>
+              <i class="fa-solid fa-skull"></i><i class="fa-solid fa-skull"></i>
+              <i class="fa-solid fa-skull"></i>
+            </span>
+          </div>
+        </a>
+
+        <!-- Compact X -->
+        <a href="#" class="archive-entry compact" role="listitem">
+          <div class="compact-num">X</div>
+          <div class="compact-cat-col">
+            <span class="entry-cat"><i class="fa-solid fa-khanda"></i> Fiction</span>
+          </div>
+          <div class="compact-body">
+            <span class="compact-title">Joe Abercrombie — The Blade Itself</span>
+          </div>
+          <div class="compact-meta-col">
+            <span class="compact-date">Nov MMXXV</span>
+            <span class="rating">
+              <i class="fa-solid fa-khanda"></i><i class="fa-solid fa-khanda"></i>
+              <i class="fa-solid fa-khanda"></i><i class="fa-solid fa-khanda"></i>
+              <i class="fa-solid fa-khanda"></i>
+            </span>
+          </div>
+        </a>
+
+        <!-- Compact XI -->
+        <a href="#" class="archive-entry compact" role="listitem">
+          <div class="compact-num">XI</div>
+          <div class="compact-cat-col">
+            <span class="entry-cat"><i class="fa-solid fa-dice-d20"></i> Tabletop</span>
+          </div>
+          <div class="compact-body">
+            <span class="compact-title">Old School Essentials Advanced Fantasy</span>
+          </div>
+          <div class="compact-meta-col">
+            <span class="compact-date">Oct MMXXV</span>
+            <span class="rating">
+              <i class="fa-solid fa-dice-d20"></i><i class="fa-solid fa-dice-d20"></i>
+              <i class="fa-solid fa-dice-d20"></i><i class="fa-solid fa-dice-d20"></i>
+            </span>
+          </div>
+        </a>
+
+        <!-- Compact XII -->
+        <a href="#" class="archive-entry compact" role="listitem">
+          <div class="compact-num">XII</div>
+          <div class="compact-cat-col">
+            <span class="entry-cat"><i class="fa-solid fa-skull"></i> Music</span>
+          </div>
+          <div class="compact-body">
+            <span class="compact-title">Bathory — Hammerheart</span>
+          </div>
+          <div class="compact-meta-col">
+            <span class="compact-date">Sep MMXXV</span>
+            <span class="rating">
+              <i class="fa-solid fa-skull"></i><i class="fa-solid fa-skull"></i>
+              <i class="fa-solid fa-skull"></i><i class="fa-solid fa-skull"></i>
+              <i class="fa-solid fa-skull"></i>
+            </span>
+          </div>
+        </a>
+
+      </div><!-- /archive-list -->
+
+      <!-- Pagination -->
+      <nav class="pagination" aria-label="Archive pagination">
+        <a href="#" class="page-btn disabled">← Prev</a>
+        <a href="#" class="page-btn active">1</a>
+        <a href="#" class="page-btn">2</a>
+        <a href="#" class="page-btn">3</a>
+        <span class="page-btn ellipsis">···</span>
+        <a href="#" class="page-btn">8</a>
+        <div class="page-spacer"></div>
+        <span class="page-summary">Page 1 of 8 · 32 Chronicles</span>
+        <a href="#" class="page-btn">Next →</a>
+      </nav>
+
+    </div><!-- /archive-col -->
+
+    <!-- ════════════ SIDEBAR COLUMN ════════════ -->
+    <aside class="archive-sidebar" aria-label="Archive sidebar">
+
+      <!-- Browse by category -->
+      <div class="sidebar-block">
+        <div class="sidebar-label">Browse by Discipline</div>
+
+        <a href="#" class="browse-item all-item">
+          <i class="fa-solid fa-book-open" style="font-size:0.7rem;color:var(--teal-lt);width:14px;text-align:center;flex-shrink:0;"></i>
+          <span class="browse-name">All Chronicles</span>
+          <span class="browse-count">32</span>
+        </a>
+        <a href="#" class="browse-item">
+          <i class="fa-solid fa-skull"></i>
+          <span class="browse-name">Music</span>
+          <span class="browse-count">14</span>
+        </a>
+        <a href="#" class="browse-item">
+          <i class="fa-solid fa-khanda"></i>
+          <span class="browse-name">Fiction</span>
+          <span class="browse-count">10</span>
+        </a>
+        <a href="#" class="browse-item">
+          <i class="fa-solid fa-dice-d20"></i>
+          <span class="browse-name">Tabletop</span>
+          <span class="browse-count">8</span>
+        </a>
+      </div>
+
+      <!-- Browse by year -->
+      <div class="sidebar-block">
+        <div class="sidebar-label">Browse by Year</div>
+
+        <a href="#" class="year-item">
+          <span class="year-label">MMXXVI</span>
+          <span class="year-spacer"></span>
+          <span class="year-count">12</span>
+          <div class="year-bar-wrap"><div class="year-bar" style="width:100%"></div></div>
+        </a>
+        <a href="#" class="year-item">
+          <span class="year-label">MMXXV</span>
+          <span class="year-spacer"></span>
+          <span class="year-count">20</span>
+          <div class="year-bar-wrap"><div class="year-bar" style="width:100%"></div></div>
+        </a>
+      </div>
+
+      <!-- Tag cloud -->
+      <div class="sidebar-block">
+        <div class="sidebar-label">Index of the Grimoire</div>
+        <div class="sidebar-tags">
+          <a href="#" class="tag">OSR</a>
+          <a href="#" class="tag">Black Metal</a>
+          <a href="#" class="tag">Dungeon Synth</a>
+          <a href="#" class="tag">Grimdark</a>
+          <a href="#" class="tag">Cassette</a>
+          <a href="#" class="tag">Vinyl</a>
+          <a href="#" class="tag">Epic Metal</a>
+          <a href="#" class="tag">D&amp;D</a>
+          <a href="#" class="tag">Pathfinder</a>
+          <a href="#" class="tag">Indie RPG</a>
+          <a href="#" class="tag">High Fantasy</a>
+          <a href="#" class="tag">Dragonlance</a>
+          <a href="#" class="tag">Heavy Metal</a>
+          <a href="#" class="tag">Cult Classic</a>
+          <a href="#" class="tag">TTRPG</a>
+          <a href="#" class="tag">Spotlight</a>
+        </div>
+      </div>
+
+      <!-- Sigil block -->
+      <div class="sidebar-block" style="background:var(--panel-bg);box-shadow:inset 0 0 0 5px var(--panel-bg),inset 0 0 0 6px var(--red-dim);display:flex;align-items:center;justify-content:center;padding:24px;position:relative;overflow:hidden;">
+        <div style="position:absolute;inset:0;background:radial-gradient(ellipse 80% 80% at 50% 50%,rgba(196,148,122,0.07) 0%,transparent 70%);pointer-events:none;"></div>
+        <svg viewBox="0 0 160 144" fill="none" xmlns="http://www.w3.org/2000/svg"
+             style="width:110px;height:99px;opacity:0.45;filter:drop-shadow(0 0 10px rgba(232,224,204,0.1));position:relative;z-index:1;">
+          <circle cx="80" cy="72" r="66" stroke="var(--red)" stroke-width="1" fill="none" opacity="0.35"/>
+          <circle cx="80" cy="72" r="60" stroke="#e8e0cc" stroke-width="0.6" fill="none" opacity="0.2"/>
+          <path d="M80 6 L84 12 L80 18 L76 12 Z"   fill="var(--red)" opacity="0.7"/>
+          <path d="M80 126 L84 132 L80 138 L76 132 Z" fill="var(--red)" opacity="0.7"/>
+          <path d="M14 72 L20 68 L26 72 L20 76 Z"   fill="var(--red)" opacity="0.7"/>
+          <path d="M134 72 L140 68 L146 72 L140 76 Z" fill="var(--red)" opacity="0.7"/>
+          <text x="80" y="98" font-family="UnifrakturMaguntia, cursive" font-size="72"
+                fill="var(--white)" text-anchor="middle" opacity="0.9" letter-spacing="-4">WP</text>
+          <line x1="30" y1="108" x2="130" y2="108" stroke="var(--red)" stroke-width="0.8" opacity="0.5"/>
+        </svg>
+      </div>
+
+    </aside><!-- /archive-sidebar -->
+
+  </div><!-- /archive-layout -->
+
+</main>
+
+<!-- ════════════════════════════════════════
+     FOOTER
+════════════════════════════════════════ -->
+<footer>
+  <svg class="footer-sigil-svg" viewBox="0 0 200 150" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="100" cy="75" r="66" stroke="var(--red)" stroke-width="1" fill="none" opacity="0.35"/>
+    <circle cx="100" cy="75" r="60" stroke="#e8e0cc" stroke-width="0.6" fill="none" opacity="0.2"/>
+    <path d="M100 8 L104 15 L100 22 L96 15 Z"   fill="var(--red)" opacity="0.7"/>
+    <path d="M100 128 L104 135 L100 142 L96 135 Z" fill="var(--red)" opacity="0.7"/>
+    <path d="M33 75 L40 71 L47 75 L40 79 Z"     fill="var(--red)" opacity="0.7"/>
+    <path d="M153 75 L160 71 L167 75 L160 79 Z"  fill="var(--red)" opacity="0.7"/>
+    <text x="100" y="103"
+          font-family="UnifrakturMaguntia, cursive"
+          font-size="72" fill="var(--white)"
+          text-anchor="middle" opacity="0.9" letter-spacing="-4">WP</text>
+    <line x1="46" y1="112" x2="154" y2="112" stroke="var(--red)" stroke-width="0.8" opacity="0.5"/>
+  </svg>
+  <div class="foot-title">Wyrmwood Palisades</div>
+  <div class="foot-sub">Epic Music · High Fantasy · Tabletop RPGs · Vol. I · MMXXVI</div>
+  <div class="foot-copy">© MMXXVI · All Rights Reserved · For Rogues, Riff-Lords, and Realm-Seekers</div>
+</footer>
+
+<!-- Theme toggle -->
+<button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle theme">
+  <span class="theme-toggle-icon" id="toggle-icon">☀</span>
+  <span id="toggle-label">Light Mode</span>
+</button>
+
+<script>
+  function toggleNav() {
+    const nav = document.getElementById('header-nav');
+    const btn = document.getElementById('hamburger');
+    nav.classList.toggle('open');
+    btn.classList.toggle('open');
+  }
+
+  function toggleTheme() {
+    const html = document.documentElement;
+    const isLight = html.getAttribute('data-theme') === 'light';
+    html.setAttribute('data-theme', isLight ? 'dark' : 'light');
+    document.getElementById('toggle-icon').textContent = isLight ? '☀' : '☽';
+    document.getElementById('toggle-label').textContent = isLight ? 'Light Mode' : 'Dark Mode';
+  }
+</script>
+
+</body>
+</html>
+```
+
+Here's a breakdown of every new component and the design thinking behind each:
+
+**Archive Banner** — A flex row with the page title on the left and a three-cell stat block on the right. The title uses `UnifrakturMaguntia` in `--teal-lt` at a size between the site title and a section header, so it reads as a page heading without competing with the main `<h1>`. The stat block uses the same double inset-border treatment as the featured panels, with `Cinzel Decorative` numerals in `--red-pale` for immediate scannability.
+
+**Filter Bar** — Sits flush above the archive list with `border-bottom: none` so it reads as a unified block. Each tab carries the category's FA icon in `--amber` alongside the Cinzel label, and a small count badge in a bordered pill. The active tab gets `border-bottom: 2px solid var(--teal-lt)` — the only place in the design system where a bottom accent line is used, making the active state feel distinct without being loud.
+
+**Year Dividers** — A flex rule-label-rule with the year in `UnifrakturMaguntia` at `1.3rem` in `--red-dim`. Intentionally more muted than the `section-label` (which uses `--teal-lt` at `2rem`) so they read as internal list markers rather than page-level section headers.
+
+**Featured Entries** — Elevated with a left `2px solid var(--red-dim)` accent bar, a subtle warm wash background, `Cinzel Decorative` title, an excerpt in IM Fell italic, and the same `btn-read` style button from the index page. A `Spotlight` badge appears for editorially promoted entries.
+
+**Compact Entries** — A four-column flex row: Roman numeral · category col · title col · meta col. The columns are separated by very low-opacity `rgba` borders so the grid reads without being heavy. `Crimson Pro` for the title keeps density readable. On mobile the row wraps into two lines.
+
+**Pagination** — Uses the same cell-and-divider logic as the sub-nav and meta bar. A `page-spacer` flex element pushes the summary text and Next button to opposite ends, and the summary reads `Page 1 of 8 · 32 Chronicles` in italic IM Fell so it feels like a colophon.
+
+**Sidebar** — Browse by Discipline and Browse by Year both use lightweight `rgba` row dividers rather than full `--red-dim` borders, which keeps the sidebar feeling calmer than the dense listing column. The year bars are decorative width indicators. The WP sigil at the bottom uses the same inset-border panel treatment as the index page sidebar sigil.
