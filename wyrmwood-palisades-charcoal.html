@@ -1,0 +1,919 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Wyrmwood Palisades</title>
+<link href="https://fonts.googleapis.com/css2?family=UnifrakturMaguntia&family=MedievalSharp&family=Cinzel:wght@400;600;700;900&family=Cinzel+Decorative:wght@400;700&family=IM+Fell+English:ital@0;1&family=Crimson+Pro:ital,wght@0,400;0,600;1,400;1,600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+<style>
+  :root {
+    --black:     #1e1e1e;
+    --near-black:#272624;
+    --red:       #c4947a;
+    --red-dim:   #6b5248;
+    --red-pale:  #e8b89a;
+    --red-wash:  rgba(196,148,122,0.1);
+    --white:     #e8e0cc;
+    --white-dim: #9a9080;
+    --panel-bg:  #222120;
+    --teal:      #4a7070;
+    --teal-lt:   #8ab4b0;
+    --amber:     #c8a878;
+    --rust:      #a07060;
+  }
+
+  [data-theme="light"] {
+    --black:     #f0e8d8;
+    --near-black:#e4d8c4;
+    --red:       #8a4a30;
+    --red-dim:   #b07858;
+    --red-pale:  #6a3820;
+    --red-wash:  rgba(138,74,48,0.08);
+    --white:     #3a3028;
+    --white-dim: #6a5e50;
+    --panel-bg:  #e8ddc8;
+    --teal:      #7a3a28;
+    --teal-lt:   #9a4a32;
+    --amber:     #7a4e28;
+    --rust:      #9a5838;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--black);
+    color: var(--white);
+    font-family: 'IM Fell English', Georgia, serif;
+    overflow-x: hidden;
+    min-height: 100vh;
+  }
+
+  /* ══════════════════════════════
+     HEADER
+  ══════════════════════════════ */
+  header {
+    border-bottom: 1px solid var(--red-dim);
+    position: relative; overflow: hidden;
+  }
+
+  /* Top label bar — like "The Fantasy Trip · 3208" */
+  .top-bar {
+    background: var(--near-black);
+    border-bottom: 1px solid var(--red-dim);
+    padding: 6px 28px;
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  .top-bar-label {
+    font-family: 'Cinzel', serif;
+    font-size: 0.6rem; letter-spacing: 0.35em;
+    text-transform: uppercase; color: var(--white-dim);
+    display: flex; align-items: center; gap: 12px;
+  }
+  .top-bar-label::before {
+    content: '';
+    display: inline-block; width: 6px; height: 6px;
+    border: 1px solid var(--red-dim); transform: rotate(45deg);
+  }
+  .top-bar-num {
+    font-family: 'Cinzel', serif;
+    font-size: 0.65rem; letter-spacing: 0.2em;
+    color: var(--red-pale);
+    border: 1px solid var(--red-dim);
+    padding: 2px 8px;
+  }
+
+  /* Header body */
+  .header-body {
+    padding: 32px 36px 0;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 24px;
+    align-items: start;
+    position: relative; z-index: 2;
+  }
+
+  /* Charcoal atmosphere behind title */
+  .header-body::before {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+    background:
+      radial-gradient(ellipse 65% 80% at 25% 50%, rgba(138,180,176,0.12) 0%, transparent 60%),
+      radial-gradient(ellipse 45% 60% at 85% 35%, rgba(200,168,120,0.1) 0%, transparent 55%);
+    pointer-events: none;
+  }
+
+  /* BIG BLACKLETTER TITLE — like "Orb Quest" */
+  .site-title {
+    font-family: 'UnifrakturMaguntia', cursive;
+    font-size: clamp(4rem, 13vw, 9rem);
+    line-height: 0.88;
+    color: var(--white);
+    letter-spacing: 0.02em;
+    text-shadow:
+      2px 2px 0   rgba(0,0,0,0.25),
+      0   0   30px rgba(196,148,122,0.12),
+      1px 0   0   rgba(196,148,122,0.15);
+    animation: revealDown 0.8s cubic-bezier(0.16,1,0.3,1) both;
+    position: relative;
+  }
+
+  /* Nav — vertical stacked, mobile only */
+  .header-nav-block {
+    display: none; /* hidden on desktop */
+    flex-direction: column;
+    border: 1px solid var(--red-dim);
+    align-self: start; margin-top: 4px;
+    animation: fadeIn 0.8s ease 0.3s both;
+  }
+  .header-nav-block a {
+    font-family: 'Cinzel', serif;
+    font-size: 0.68rem; letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--white-dim);
+    text-decoration: none;
+    padding: 9px 18px;
+    border-bottom: 1px solid var(--red-dim);
+    transition: background 0.2s, color 0.2s;
+    white-space: nowrap;
+  }
+  .header-nav-block a:last-child { border-bottom: none; }
+  .header-nav-block a:hover { background: var(--red-dim); color: var(--white); }
+
+  /* Hamburger button — mobile only */
+  .hamburger {
+    display: none;
+    flex-direction: column; justify-content: center; gap: 5px;
+    width: 36px; height: 36px;
+    background: none; border: 1px solid var(--red-dim);
+    cursor: pointer; padding: 8px;
+    align-self: start; margin-top: 4px;
+    transition: background 0.2s;
+  }
+  .hamburger:hover { background: var(--red-wash); }
+  .hamburger span {
+    display: block; width: 100%; height: 1px;
+    background: var(--white-dim);
+    transition: transform 0.2s, opacity 0.2s;
+  }
+  .hamburger.open span:nth-child(1) { transform: translateY(6px) rotate(45deg); }
+  .hamburger.open span:nth-child(2) { opacity: 0; }
+  .hamburger.open span:nth-child(3) { transform: translateY(-6px) rotate(-45deg); }
+
+  @media (max-width: 640px) {
+    .hamburger { display: flex; }
+    .header-nav-block.open {
+      display: flex;
+      position: absolute; top: 55%; right: 0;
+      background: var(--near-black);
+      z-index: 100;
+      border: 1px solid var(--red-dim);
+      min-width: 160px;
+    }
+    .sub-nav { display: none; }
+    .mini-list { border-right: none; border-bottom: 1px solid var(--red-dim); }
+    .card-grid .card:nth-child(2) { border-top: 1px solid var(--red-dim); border-bottom: 1px solid var(--red-dim); }
+    .feat-foot { margin-bottom: 44px; }
+    .card { border-right: none !important; }
+    .mini-list { border-right: none !important; }
+    header { border-bottom: none; }
+  }
+
+  /* Tagline — italic IM Fell, like "More Thrills in Thorsz's Service..." */
+  .header-tagline {
+    padding: 14px 36px 24px;
+    font-family: 'IM Fell English', Georgia, serif;
+    font-style: italic;
+    font-size: 1rem;
+    color: var(--white-dim);
+    line-height: 1.7;
+    max-width: 540px;
+    animation: fadeIn 0.8s ease 0.2s both;
+    letter-spacing: 0.02em;
+  }
+
+  /* Sub-nav — horizontal, Cinzel small caps, desktop only */
+  .sub-nav {
+    border-top: 1px solid var(--red-dim);
+    display: none; overflow: hidden; align-items: center;
+    animation: fadeIn 0.8s ease 0.4s both;
+  }
+  @media (min-width: 641px) {
+    .sub-nav { display: flex; }
+  }
+  .sub-nav a {
+    font-family: 'Cinzel', serif;
+    font-size: 0.62rem; letter-spacing: 0.28em;
+    text-transform: uppercase;
+    color: var(--white-dim);
+    text-decoration: none;
+    padding: 10px 20px;
+    border-right: 1px solid var(--red-dim);
+    transition: color 0.2s, background 0.2s;
+    display: flex; align-items: center;
+  }
+  .sub-nav a:hover { color: var(--white); background: var(--red-wash); }
+  .sub-nav .spacer { flex: 1; }
+  .sub-nav .issue {
+    font-family: 'IM Fell English', serif;
+    font-style: italic; font-size: 0.72rem;
+    color: var(--red-dim);
+    display: flex; align-items: center;
+    padding: 0 20px;
+  }
+
+  /* ══════════════════════════════
+     PAGE WRAP
+  ══════════════════════════════ */
+  .page-wrap {
+    max-width: 1020px; margin: 0 auto;
+    padding: 40px 36px 60px;
+    position: relative; z-index: 2;
+    animation: revealUp 0.7s ease 0.45s both;
+  }
+
+  /* ── FEATURED ── */
+  .featured {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    margin-bottom: 44px;
+  }
+  @media (max-width: 640px) { .featured { grid-template-columns: 1fr; } }
+
+  .feat-text {}
+
+  .feat-kicker {
+    font-family: 'Cinzel', serif;
+    font-size: 0.6rem; letter-spacing: 0.38em;
+    text-transform: uppercase; color: var(--teal-lt);
+    margin-bottom: 10px;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .feat-kicker::after { content: ''; flex: 1; height: 1px; background: var(--red-dim); }
+
+  /* Cinzel Decorative for featured post title — the "MicroQuest 8" feel */
+  .feat-title {
+    font-family: 'Cinzel Decorative', serif;
+    font-size: clamp(1.6rem, 4.5vw, 2.6rem);
+    font-weight: 700;
+    line-height: 1.1;
+    color: var(--white);
+    text-shadow:
+      1px 1px 0 rgba(0,0,0,0.2),
+      0 0 20px rgba(196,148,122,0.1);
+    margin-bottom: 18px;
+    letter-spacing: 0.02em;
+  }
+
+  .feat-body-text {
+    font-family: 'IM Fell English', serif;
+    font-size: 0.98rem;
+    line-height: 1.85;
+    color: var(--white-dim);
+    margin-bottom: 22px;
+    font-style: italic;
+  }
+
+  /* Framed panel — like the illustration frame on Orb Quest */
+  .feat-panel-sm {
+    border: 1px solid var(--red-dim);
+    /* Double-border effect like the card's inner frame */
+    outline: 3px solid var(--black);
+    outline-offset: -6px;
+    box-shadow: inset 0 0 0 7px var(--black), inset 0 0 0 8px var(--red-dim);
+    background: var(--panel-bg);
+    height: 175px;
+    position: relative; overflow: hidden;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .feat-panel-sm::before {
+    content: '';
+    position: absolute; inset: 0;
+    background:
+      radial-gradient(ellipse 75% 55% at 50% 30%, rgba(138,180,176,0.3) 0%, transparent 65%),
+      radial-gradient(ellipse 85% 50% at 50% 100%, rgba(196,148,122,0.4) 0%, rgba(180,120,100,0.15) 45%, transparent 65%),
+      radial-gradient(ellipse 50% 40% at 15% 55%, rgba(200,168,120,0.2) 0%, transparent 50%);
+  }
+  /* Dot grid like v4 */
+  .feat-panel-sm::after {
+    content: '';
+    position: absolute; inset: 0;
+    background-image: radial-gradient(circle, rgba(196,148,122,0.07) 1px, transparent 1px);
+    background-size: 7px 7px;
+  }
+  .panel-glyph-sm {
+    font-family: 'UnifrakturMaguntia', cursive;
+    font-size: 4.5rem; color: rgba(196,148,122,0.15);
+    text-shadow: 0 0 30px rgba(196,148,122,0.2);
+    z-index: 1; position: relative;
+  }
+  .panel-border-label {
+    position: absolute; bottom: 14px; left: 14px;
+    font-family: 'Cinzel', serif;
+    font-size: 0.55rem; letter-spacing: 0.25em;
+    text-transform: uppercase; color: var(--white-dim);
+    z-index: 2;
+  }
+  [data-theme="light"] .panel-border-label {
+    color: var(--white-dim);
+  }
+
+  .feat-foot {
+    display: flex; justify-content: space-between; align-items: center;
+    padding-top: 14px; margin-top: 14px;
+  }
+  .feat-date {
+    font-family: 'IM Fell English', serif;
+    font-style: italic; font-size: 0.78rem;
+    color: var(--red-dim);
+    letter-spacing: 0.05em;
+  }
+  .btn-read {
+    font-family: 'Cinzel', serif;
+    font-size: 0.62rem; letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--black);
+    background: var(--white);
+    text-decoration: none;
+    padding: 6px 16px;
+    border: 1px solid var(--white);
+    transition: background 0.2s, color 0.2s, border-color 0.2s;
+  }
+  .btn-read:hover { background: var(--red-dim); border-color: var(--red-dim); color: var(--white); }
+
+  /* Big right panel */
+  .feat-panel-lg {
+    border: 1px solid var(--red-dim);
+    box-shadow: inset 0 0 0 7px var(--black), inset 0 0 0 8px var(--red-dim);
+    background: var(--panel-bg);
+    min-height: 420px;
+    position: relative; overflow: hidden;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .feat-panel-lg::before {
+    content: '';
+    position: absolute; inset: 0;
+    background:
+      radial-gradient(ellipse 80% 55% at 50% 15%, rgba(138,180,176,0.35) 0%, rgba(100,148,148,0.1) 50%, transparent 70%),
+      radial-gradient(ellipse 55% 40% at 15% 50%, rgba(138,180,176,0.2) 0%, transparent 55%),
+      radial-gradient(ellipse 100% 50% at 50% 100%, rgba(196,148,122,0.55) 0%, rgba(180,110,90,0.2) 40%, transparent 62%),
+      radial-gradient(ellipse 60% 35% at 50% 58%, rgba(20,18,18,0.75) 0%, transparent 70%);
+  }
+  .feat-panel-lg::after {
+    content: '';
+    position: absolute; inset: 0;
+    background-image: radial-gradient(circle, rgba(196,148,122,0.06) 1px, transparent 1px);
+    background-size: 7px 7px;
+    pointer-events: none;
+  }
+  .panel-glyph-lg {
+    font-family: 'UnifrakturMaguntia', cursive;
+    font-size: 8rem; color: rgba(196,148,122,0.12);
+    text-shadow: 0 0 60px rgba(196,148,122,0.2);
+    z-index: 1; position: relative;
+    animation: breathe 5s ease-in-out infinite alternate;
+  }
+  @keyframes breathe {
+    from { opacity: 0.7; text-shadow: 0 0 40px rgba(196,148,122,0.15); }
+    to   { opacity: 1;   text-shadow: 0 0 90px rgba(196,148,122,0.3); }
+  }
+  .panel-caption {
+    position: absolute; bottom: 0; left: 0; right: 0;
+    background: rgba(0,0,0,0.7);
+    border-top: 1px solid var(--red-dim);
+    padding: 10px 16px;
+    font-family: 'IM Fell English', serif;
+    font-style: italic; font-size: 0.85rem;
+    color: var(--white-dim); z-index: 2;
+  }
+  [data-theme="light"] .panel-caption {
+    background: rgba(232,224,204,0.92);
+    color: var(--white-dim);
+  }
+
+  /* ── SECTION DIVIDER ── */
+  .section-label {
+    display: flex; align-items: center; gap: 16px;
+    padding-top: 14px; margin-bottom: 1px;
+  }
+  .section-label-text {
+    font-family: 'UnifrakturMaguntia', cursive;
+    font-size: 2rem;
+    color: var(--teal-lt);
+    text-shadow: 1px 1px 0 rgba(0,0,0,0.2), 0 0 15px rgba(138,180,176,0.2);
+    white-space: nowrap;
+  }
+  .section-rule { flex: 1; height: 1px; background: linear-gradient(to right, var(--red-dim), rgba(138,180,176,0.25), var(--red-dim)); }
+  .section-ornament { color: var(--teal-lt); font-size: 0.9rem; }
+
+  /* ── THREE CARDS ── */
+  .card-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    border: 1px solid var(--red-dim); border-top: none;
+    margin-bottom: 44px;
+  }
+  @media (max-width: 600px) { .card-grid { grid-template-columns: 1fr; } }
+
+  .card {
+    padding: 22px 20px;
+    border-right: 1px solid var(--red-dim);
+    position: relative; overflow: hidden;
+    transition: background 0.2s;
+  }
+  .card:last-child { border-right: none; }
+  .card:hover { background: rgba(196,148,122,0.04); }
+
+  .card::after {
+    content: '';
+    position: absolute; inset: 0; pointer-events: none;
+    background-image: radial-gradient(circle, rgba(196,148,122,0.05) 1px, transparent 1px);
+    background-size: 7px 7px;
+    opacity: 0; transition: opacity 0.3s;
+  }
+  .card:hover::after { opacity: 1; }
+
+  /* Watermark number in blackletter */
+  .card-num {
+    font-family: 'Cinzel', serif;
+    font-size: 3.5rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    color: rgba(196,148,122,0.22);
+    position: absolute; top: 8px; right: 12px;
+    line-height: 1; pointer-events: none;
+  }
+
+  .card-cat {
+    font-family: 'Cinzel', serif;
+    font-size: 0.58rem; letter-spacing: 0.32em;
+    text-transform: uppercase; color: var(--teal-lt);
+    margin-bottom: 9px;
+  }
+  .card-title {
+    font-family: 'Cinzel Decorative', serif;
+    font-size: 1.0rem; font-weight: 700;
+    line-height: 1.2; letter-spacing: 0.01em;
+    color: var(--white);
+    text-shadow: 1px 1px 0 rgba(0,0,0,0.2), 0 0 15px rgba(138,180,176,0.08);
+    margin-bottom: 11px;
+  }
+  .card-body {
+    font-family: 'IM Fell English', serif;
+    font-style: italic; font-size: 0.9rem;
+    line-height: 1.78; color: var(--white-dim);
+    margin-bottom: 16px;
+  }
+  .card-date {
+    font-family: 'IM Fell English', serif;
+    font-style: italic; font-size: 0.72rem;
+    color: var(--amber);
+    padding-top: 10px; display: block;
+  }
+
+  /* ── BOTTOM GRID ── */
+  .bottom-grid {
+    display: grid;
+    grid-template-columns: 1fr 300px;
+    border-left: 1px solid var(--red-dim);
+    border-right: 1px solid var(--red-dim);
+    border-bottom: 1px solid var(--red-dim);
+    margin-bottom: 44px;
+  }
+  @media (max-width: 640px) { .bottom-grid { grid-template-columns: 1fr; } }
+
+  .mini-list { border-right: 1px solid var(--red-dim); }
+
+  .list-header {
+    font-family: 'IM Fell English', serif;
+    font-style: italic; font-size: 0.82rem;
+    color: var(--white-dim); opacity: 0.7;
+    padding: 9px 20px;
+    border-bottom: 1px solid var(--red-dim);
+    background: rgba(196,148,122,0.04);
+    letter-spacing: 0.03em;
+  }
+
+  .mini-item {
+    display: flex;
+    border-bottom: 1px solid rgba(196,148,122,0.15);
+    cursor: pointer; transition: background 0.2s;
+  }
+  .mini-item:last-child { border-bottom: none; }
+  .mini-item:hover { background: rgba(196,148,122,0.05); }
+
+  /* Blackletter numeral */
+  .mini-index {
+    font-family: 'Cinzel', serif;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: rgba(196,148,122,0.35);
+    padding: 14px 12px 14px 18px;
+    line-height: 1.3; flex-shrink: 0;
+    letter-spacing: 0.05em;
+  }
+
+  .mini-body { padding: 13px 18px 13px 0; }
+  .mini-cat {
+    font-family: 'Cinzel', serif;
+    font-size: 0.55rem; letter-spacing: 0.3em;
+    text-transform: uppercase; color: var(--teal-lt);
+    margin-bottom: 3px;
+  }
+  .mini-title {
+    font-family: 'Crimson Pro', serif;
+    font-size: 0.95rem; font-weight: 600;
+    color: var(--white); line-height: 1.3; margin-bottom: 3px;
+  }
+  .mini-date {
+    font-family: 'IM Fell English', serif;
+    font-style: italic; font-size: 0.7rem;
+    color: var(--amber);
+  }
+
+  /* Sigil block */
+  .sigil-block { display: flex; flex-direction: column; }
+
+  .sigil-display {
+    flex: 1;
+    background: var(--panel-bg);
+    border-bottom: 1px solid var(--red-dim);
+    /* Double inner frame like Orb Quest illustration */
+    box-shadow: inset 0 0 0 6px var(--panel-bg), inset 0 0 0 7px var(--red-dim);
+    display: flex; align-items: center; justify-content: center;
+    padding: 20px; min-height: 175px;
+    position: relative; overflow: hidden;
+  }
+  .sigil-display::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: radial-gradient(ellipse 80% 80% at 50% 50%, rgba(196,148,122,0.1) 0%, transparent 70%);
+  }
+  .sigil-svg {
+    width: 160px; height: 144px;
+    position: relative; z-index: 1;
+    opacity: 0.5;
+    filter: drop-shadow(0 0 10px rgba(232,224,204,0.12));
+  }
+
+  .tags-section { padding: 18px; }
+  .tags-label {
+    font-family: 'Cinzel', serif;
+    font-size: 0.58rem; letter-spacing: 0.3em;
+    text-transform: uppercase; color: var(--teal-lt);
+    margin-bottom: 10px;
+  }
+  .tag-cloud { display: flex; flex-wrap: wrap; gap: 5px; }
+  .tag {
+    font-family: 'Cinzel', serif;
+    font-size: 0.58rem; letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--white-dim);
+    border: 1px solid var(--red-dim);
+    padding: 3px 9px; text-decoration: none;
+    transition: all 0.2s;
+  }
+  .tag:hover { background: var(--red-dim); color: var(--white); border-color: var(--red-dim); }
+
+  /* ══════════════════════════════
+     FOOTER
+  ══════════════════════════════ */
+  footer {
+    border-top: 1px solid var(--red-dim);
+    background: var(--near-black);
+    text-align: center;
+    padding: 32px 28px 28px;
+    position: relative; z-index: 2;
+  }
+
+  .footer-sigil-svg {
+    width: 200px; height: 150px;
+    margin: 0 auto 14px; display: block;
+    opacity: 0.55;
+    filter: drop-shadow(0 0 18px rgba(232,224,204,0.08));
+  }
+
+  .foot-title {
+    font-family: 'UnifrakturMaguntia', cursive;
+    font-size: 2.8rem; color: var(--white);
+    text-shadow:
+      1px 1px 0 rgba(0,0,0,0.25),
+      0 0 30px rgba(196,148,122,0.15),
+      0 0 60px rgba(138,180,176,0.1);
+    letter-spacing: 0.02em; margin-bottom: 6px;
+  }
+  .foot-sub {
+    font-family: 'Cinzel', serif;
+    font-size: 0.58rem; letter-spacing: 0.35em;
+    text-transform: uppercase; color: var(--red-dim);
+    margin-bottom: 4px;
+  }
+  .foot-copy {
+    font-family: 'IM Fell English', serif;
+    font-style: italic; font-size: 0.72rem;
+    color: var(--white-dim); opacity: 0.3;
+  }
+
+  /* ── RATING ICONS ── */
+  .rating { display: inline-flex; gap: 3px; vertical-align: middle; margin-left: 4px; }
+  .rating i { font-size: 0.65rem; color: var(--amber); opacity: 0.85; }
+  @keyframes revealDown {
+    from { opacity: 0; transform: translateY(-18px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes revealUp {
+    from { opacity: 0; transform: translateY(18px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+  }
+
+  /* ── THEME TOGGLE ── */
+  .theme-toggle {
+    position: fixed;
+    bottom: 24px; right: 24px;
+    z-index: 999;
+    background: var(--near-black);
+    border: 1px solid var(--red-dim);
+    color: var(--white-dim);
+    font-family: 'Cinzel', serif;
+    font-size: 0.58rem; letter-spacing: 0.22em;
+    text-transform: uppercase;
+    padding: 8px 14px;
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s, border-color 0.2s;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .theme-toggle:hover {
+    background: var(--red-dim);
+    color: var(--white);
+  }
+  .theme-toggle-icon {
+    font-size: 0.9rem;
+    line-height: 1;
+  }
+
+  /* Light mode panel gradient overrides */
+  [data-theme="light"] .feat-panel-lg::before {
+    background:
+      radial-gradient(ellipse 80% 55% at 50% 15%, rgba(100,148,148,0.2) 0%, rgba(80,120,120,0.06) 50%, transparent 70%),
+      radial-gradient(ellipse 55% 40% at 15% 50%, rgba(100,148,148,0.12) 0%, transparent 55%),
+      radial-gradient(ellipse 100% 50% at 50% 100%, rgba(160,100,70,0.3) 0%, rgba(140,80,50,0.1) 40%, transparent 62%),
+      radial-gradient(ellipse 60% 35% at 50% 58%, rgba(220,205,185,0.5) 0%, transparent 70%);
+  }
+  [data-theme="light"] .feat-panel-sm::before {
+    background:
+      radial-gradient(ellipse 75% 55% at 50% 30%, rgba(100,148,148,0.18) 0%, transparent 65%),
+      radial-gradient(ellipse 85% 50% at 50% 100%, rgba(160,100,70,0.25) 0%, transparent 65%),
+      radial-gradient(ellipse 50% 40% at 15% 55%, rgba(160,130,90,0.12) 0%, transparent 50%);
+  }
+  [data-theme="light"] .header-body::before {
+    background:
+      radial-gradient(ellipse 65% 80% at 25% 50%, rgba(80,120,110,0.08) 0%, transparent 60%),
+      radial-gradient(ellipse 45% 60% at 85% 35%, rgba(160,100,70,0.07) 0%, transparent 55%);
+  }
+  [data-theme="light"] .foot-title {
+    text-shadow:
+      1px 1px 0 rgba(255,255,255,0.3),
+      0 0 20px rgba(138,74,48,0.08);
+  }
+  [data-theme="light"] .section-label-text {
+    text-shadow: 1px 1px 0 rgba(255,255,255,0.3), 0 0 15px rgba(46,88,72,0.1);
+  }
+</style>
+</head>
+<body>
+
+<!-- ── HEADER ── -->
+<header>
+  <div class="top-bar">
+    <div class="top-bar-label">For Rogues, Riff-Lords, and Realm-Seekers</div>
+    <div class="top-bar-num">Vol. I · XII</div>
+  </div>
+
+  <div class="header-body">
+    <div>
+      <h1 class="site-title">Wyrmwood<br>Palisades</h1>
+    </div>
+    <button class="hamburger" id="hamburger" aria-label="Toggle navigation" onclick="toggleNav()">
+      <span></span><span></span><span></span>
+    </button>
+    <nav class="header-nav-block" id="header-nav">
+      <a href="#">All Reviews</a>
+      <a href="#">Music</a>
+      <a href="#">Fiction</a>
+      <a href="#">Tabletop</a>
+      <a href="#">Spotlight</a>
+      <a href="#">About</a>
+    </nav>
+  </div>
+
+  <p class="header-tagline">Reviews of epic music, high fantasy fiction, and tabletop RPGs — for anyone who has argued about the best fantasy novel, worn out a cassette tape, or rolled dice until midnight . . .</p>
+
+  <nav class="sub-nav">
+    <a href="#">All Reviews</a>
+    <a href="#">Music</a>
+    <a href="#">Fiction</a>
+    <a href="#">Tabletop</a>
+    <a href="#">Spotlight</a>
+    <a href="#">Archive</a>
+    <div class="spacer"></div>
+    <div class="issue">March Spotlight</div>
+  </nav>
+</header>
+
+<!-- ── MAIN ── -->
+<main class="page-wrap">
+
+  <!-- Featured -->
+  <div class="featured">
+    <div class="feat-text">
+      <div class="feat-kicker">⚔ Featured Chronicle</div>
+      <h2 class="feat-title">The Dark Grimoire of Hex & Hum</h2>
+      <p class="feat-body-text">When the suns of the old world drowned in ash, the dungeon remained. Old-school RPGs and the soundtracks that haunt them — on the particular silence between turns, the slow turning of graph paper, and music as prophecy rendered in halftone and hiss. They do not merely play; they become the labyrinth.</p>
+      <div class="feat-panel-sm">
+        <svg viewBox="0 0 160 144" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:100px;height:90px;position:relative;z-index:1;opacity:0.5;filter:drop-shadow(0 0 10px rgba(232,224,204,0.12))">
+          <circle cx="80" cy="72" r="66" stroke="var(--red)" stroke-width="1" fill="none" opacity="0.35"/>
+          <circle cx="80" cy="72" r="60" stroke="#e8e0cc" stroke-width="0.6" fill="none" opacity="0.2"/>
+          <path d="M80 6 L84 12 L80 18 L76 12 Z" fill="var(--red)" opacity="0.7"/>
+          <path d="M80 126 L84 132 L80 138 L76 132 Z" fill="var(--red)" opacity="0.7"/>
+          <path d="M14 72 L20 68 L26 72 L20 76 Z" fill="var(--red)" opacity="0.7"/>
+          <path d="M134 72 L140 68 L146 72 L140 76 Z" fill="var(--red)" opacity="0.7"/>
+          <text x="80" y="98" font-family="UnifrakturMaguntia, cursive" font-size="72" fill="var(--white)" text-anchor="middle" opacity="0.9" letter-spacing="-4">WP</text>
+          <line x1="30" y1="108" x2="130" y2="108" stroke="var(--red)" stroke-width="0.8" opacity="0.5"/>
+        </svg>
+        <span class="panel-border-label">Tabletop · Monthly Spotlight</span>
+      </div>
+      <div class="feat-foot">
+        <span class="feat-date">March MMXXVI · <span class="rating"><i class="fa-solid fa-dice-d20"></i><i class="fa-solid fa-dice-d20"></i><i class="fa-solid fa-dice-d20"></i><i class="fa-solid fa-dice-d20"></i><i class="fa-solid fa-dice-d20"></i></span></span>
+        <a href="#" class="btn-read">Read the Review</a>
+      </div>
+    </div>
+
+    <div class="feat-panel-lg">
+      <svg viewBox="0 0 160 144" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:160px;height:144px;position:relative;z-index:1;opacity:0.5;filter:drop-shadow(0 0 18px rgba(232,224,204,0.15))">
+        <circle cx="80" cy="72" r="66" stroke="var(--red)" stroke-width="1" fill="none" opacity="0.35"/>
+        <circle cx="80" cy="72" r="60" stroke="#e8e0cc" stroke-width="0.6" fill="none" opacity="0.2"/>
+        <path d="M80 6 L84 12 L80 18 L76 12 Z" fill="var(--red)" opacity="0.7"/>
+        <path d="M80 126 L84 132 L80 138 L76 132 Z" fill="var(--red)" opacity="0.7"/>
+        <path d="M14 72 L20 68 L26 72 L20 76 Z" fill="var(--red)" opacity="0.7"/>
+        <path d="M134 72 L140 68 L146 72 L140 76 Z" fill="var(--red)" opacity="0.7"/>
+        <text x="80" y="98" font-family="UnifrakturMaguntia, cursive" font-size="72" fill="var(--white)" text-anchor="middle" opacity="0.9" letter-spacing="-4">WP</text>
+        <line x1="30" y1="108" x2="130" y2="108" stroke="var(--red)" stroke-width="0.8" opacity="0.5"/>
+      </svg>
+      <div class="panel-caption">March Spotlight — Independent Creator Feature</div>
+    </div>
+  </div>
+
+  <!-- Three cards -->
+  <div class="section-label">
+    <span class="section-label-text">Recent Reviews</span>
+    <div class="section-rule"></div>
+    <span class="section-ornament">✦</span>
+  </div>
+  <div class="card-grid">
+    <div class="card">
+      <div class="card-num">II</div>
+      <div class="card-cat">Music</div>
+      <div class="card-title">Summoning — With Doom We Come</div>
+      <p class="card-body">Dungeon synth royalty return, and they haven't lost a step. Sweeping, orchestral, utterly committed to Middle-earth energy. Essential listening for long hex-mapping sessions.</p>
+      <span class="card-date">March MMXXVI · <span class="rating"><i class="fa-solid fa-skull"></i><i class="fa-solid fa-skull"></i><i class="fa-solid fa-skull"></i><i class="fa-solid fa-skull"></i><i class="fa-solid fa-skull"></i></span></span>
+    </div>
+    <div class="card">
+      <div class="card-num">III</div>
+      <div class="card-cat">Fantasy Fiction</div>
+      <div class="card-title">John Gwynne — A Time of Dread</div>
+      <p class="card-body">Gwynne continues to be one of the best doing it. Big battles, real stakes, characters you actually care about. Grimdark that remembers hope exists.</p>
+      <span class="card-date">March MMXXVI · <span class="rating"><i class="fa-solid fa-khanda"></i><i class="fa-solid fa-khanda"></i><i class="fa-solid fa-khanda"></i><i class="fa-solid fa-khanda"></i></span></span>
+    </div>
+    <div class="card">
+      <div class="card-num">IV</div>
+      <div class="card-cat">Tabletop & RPGs</div>
+      <div class="card-title">Pathfinder 2e — Rage of Elements</div>
+      <p class="card-body">A hefty sourcebook that earns its page count. Kineticists are now the most fun class in the game, full stop. If you're a Pathfinder table, this one's not optional.</p>
+      <span class="card-date">Feb MMXXVI · <span class="rating"><i class="fa-solid fa-dice-d20"></i><i class="fa-solid fa-dice-d20"></i><i class="fa-solid fa-dice-d20"></i><i class="fa-solid fa-dice-d20"></i></span></span>
+    </div>
+  </div>
+
+  <!-- Mini list + sigil -->
+  <div class="section-label">
+    <span class="section-label-text">More Reviews</span>
+    <div class="section-rule"></div>
+    <span class="section-ornament">✦</span>
+  </div>
+  <div class="bottom-grid">
+    <div class="mini-list">
+      <div class="mini-item">
+        <div class="mini-index">V</div>
+        <div class="mini-body">
+          <div class="mini-cat">Music · Vinyl</div>
+          <div class="mini-title">Wolves in the Throne Room — Primordial Arcana (Limited Press)</div>
+          <div class="mini-date">Feb MMXXVI · <span class="rating"><i class="fa-solid fa-skull"></i><i class="fa-solid fa-skull"></i><i class="fa-solid fa-skull"></i><i class="fa-solid fa-skull"></i><i class="fa-solid fa-skull"></i></span></div>
+        </div>
+      </div>
+      <div class="mini-item">
+        <div class="mini-index">VI</div>
+        <div class="mini-body">
+          <div class="mini-cat">Tabletop · OSR</div>
+          <div class="mini-title">Cairn 2e — A Lean, Mean Dungeon Machine</div>
+          <div class="mini-date">Feb MMXXVI · <span class="rating"><i class="fa-solid fa-dice-d20"></i><i class="fa-solid fa-dice-d20"></i><i class="fa-solid fa-dice-d20"></i><i class="fa-solid fa-dice-d20"></i><i class="fa-solid fa-dice-d20"></i></span></div>
+        </div>
+      </div>
+      <div class="mini-item">
+        <div class="mini-index">VII</div>
+        <div class="mini-body">
+          <div class="mini-cat">Fantasy Fiction · Classic</div>
+          <div class="mini-title">Dragonlance — Chronicles Trilogy Revisited</div>
+          <div class="mini-date">Jan MMXXVI · <span class="rating"><i class="fa-solid fa-khanda"></i><i class="fa-solid fa-khanda"></i><i class="fa-solid fa-khanda"></i></span></div>
+        </div>
+      </div>
+      <div class="mini-item">
+        <div class="mini-index">VIII</div>
+        <div class="mini-body">
+          <div class="mini-cat">Music · Cassette</div>
+          <div class="mini-title">Caladan Brood — Echoes of Battle (Reissue)</div>
+          <div class="mini-date">Jan MMXXVI · <span class="rating"><i class="fa-solid fa-skull"></i><i class="fa-solid fa-skull"></i><i class="fa-solid fa-skull"></i><i class="fa-solid fa-skull"></i><i class="fa-solid fa-skull"></i></span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="sigil-block">
+      <div class="tags-section">
+        <div class="tags-label">Index of the Grimoire</div>
+        <div class="tag-cloud">
+          <a href="#" class="tag">OSR</a>
+          <a href="#" class="tag">Black Metal</a>
+          <a href="#" class="tag">Dungeon Synth</a>
+          <a href="#" class="tag">Grimdark</a>
+          <a href="#" class="tag">Cassette</a>
+          <a href="#" class="tag">Vinyl</a>
+          <a href="#" class="tag">Epic Metal</a>
+          <a href="#" class="tag">D&amp;D</a>
+          <a href="#" class="tag">Pathfinder</a>
+          <a href="#" class="tag">Indie RPG</a>
+          <a href="#" class="tag">High Fantasy</a>
+          <a href="#" class="tag">Dragonlance</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<!-- ── FOOTER ── -->
+<footer>
+  <!-- Footer: woodcut tower crown, just battlements and top -->
+  <svg class="footer-sigil-svg" viewBox="0 0 200 150" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <!-- Outer ring -->
+    <circle cx="100" cy="75" r="66" stroke="var(--red)" stroke-width="1" fill="none" opacity="0.35"/>
+    <!-- Inner ring -->
+    <circle cx="100" cy="75" r="60" stroke="#e8e0cc" stroke-width="0.6" fill="none" opacity="0.2"/>
+    <!-- Cardinal diamonds -->
+    <path d="M100 8 L104 15 L100 22 L96 15 Z"  fill="var(--red)" opacity="0.7"/>
+    <path d="M100 128 L104 135 L100 142 L96 135 Z" fill="var(--red)" opacity="0.7"/>
+    <path d="M33 75 L40 71 L47 75 L40 79 Z"   fill="var(--red)" opacity="0.7"/>
+    <path d="M153 75 L160 71 L167 75 L160 79 Z" fill="var(--red)" opacity="0.7"/>
+    <!-- WP monogram -->
+    <text x="100" y="103"
+      font-family="UnifrakturMaguntia, cursive"
+      font-size="72"
+      fill="var(--white)"
+      text-anchor="middle"
+      opacity="0.9"
+      letter-spacing="-4">WP</text>
+    <!-- Thin rule under monogram -->
+    <line x1="46" y1="112" x2="154" y2="112" stroke="var(--red)" stroke-width="0.8" opacity="0.5"/>
+  </svg>
+  <div class="foot-title">Wyrmwood Palisades</div>
+  <div class="foot-sub">Epic Music · High Fantasy · Tabletop RPGs · Vol. I · MMXXVI</div>
+  <div class="foot-copy">© MMXXVI · All Rights Reserved · For Rogues, Riff-Lords, and Realm-Seekers</div>
+</footer>
+
+<button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle theme">
+  <span class="theme-toggle-icon" id="toggle-icon">☀</span>
+  <span id="toggle-label">Light Mode</span>
+</button>
+
+<script>
+  function toggleNav() {
+    const nav = document.getElementById('header-nav');
+    const btn = document.getElementById('hamburger');
+    nav.classList.toggle('open');
+    btn.classList.toggle('open');
+  }
+
+  function toggleTheme() {
+    const html = document.documentElement;
+    const isLight = html.getAttribute('data-theme') === 'light';
+    html.setAttribute('data-theme', isLight ? 'dark' : 'light');
+    document.getElementById('toggle-icon').textContent = isLight ? '☀' : '☽';
+    document.getElementById('toggle-label').textContent = isLight ? 'Light Mode' : 'Dark Mode';
+  }
+</script>
+
+</body>
+</html>
