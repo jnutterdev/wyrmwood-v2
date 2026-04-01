@@ -1,0 +1,56 @@
+---
+import '../styles/global.css';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import ThemeToggle from '../components/ThemeToggle.astro';
+
+interface Props {
+  title: string;
+  description?: string;
+}
+
+const { title, description = 'Reviews of epic music, high fantasy fiction, and tabletop RPGs.' } = Astro.props;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content={description} />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="generator" content={Astro.generator} />
+    <title>{title} — Wyrmwood Palisades</title>
+    <link href="https://fonts.googleapis.com/css2?family=UnifrakturMaguntia&family=Cinzel:wght@400;600;700;900&family=Cinzel+Decorative:wght@400;700&family=IM+Fell+English:ital@0;1&family=Crimson+Pro:ital,wght@0,400;0,600;1,400;1,600&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  </head>
+  <body>
+    <Header />
+    <slot />
+    <Footer />
+    <ThemeToggle />
+
+    <script>
+      function toggleNav() {
+        const nav = document.getElementById('header-nav');
+        const btn = document.getElementById('hamburger');
+        nav?.classList.toggle('open');
+        btn?.classList.toggle('open');
+      }
+
+      function toggleTheme() {
+        const html = document.documentElement;
+        const isLight = html.getAttribute('data-theme') === 'light';
+        html.setAttribute('data-theme', isLight ? 'dark' : 'light');
+        const icon = document.getElementById('toggle-icon');
+        const label = document.getElementById('toggle-label');
+        if (icon) icon.textContent = isLight ? '☀' : '☽';
+        if (label) label.textContent = isLight ? 'Light Mode' : 'Dark Mode';
+      }
+
+      // Expose to inline onclick handlers
+      (window as any).toggleNav = toggleNav;
+      (window as any).toggleTheme = toggleTheme;
+    </script>
+  </body>
+</html>

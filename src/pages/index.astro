@@ -1,0 +1,384 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import SectionLabel from '../components/SectionLabel.astro';
+import WPMonogram from '../components/WPMonogram.astro';
+import Rating from '../components/Rating.astro';
+import Tag from '../components/Tag.astro';
+import { getCollection } from 'astro:content';
+
+const allReviews = await getCollection('reviews');
+allReviews.sort((a, b) => new Date(b.data.date).getTime() - new Date(a.data.date).getTime());
+
+const featured  = allReviews.find(r => r.data.featured) ?? allReviews[0];
+const cardItems = allReviews.filter(r => r.id !== featured.id).slice(0, 3);
+const miniItems = allReviews.filter(r => r.id !== featured.id).slice(3, 7);
+
+const allTags = [...new Set(allReviews.flatMap(r => r.data.tags))].sort();
+
+const catLabel: Record<string, string> = {
+  music:    'Music',
+  fiction:  'Fantasy Fiction',
+  tabletop: 'Tabletop & RPGs',
+};
+
+const romanCardNumerals = ['II', 'III', 'IV'];
+const romanMiniNumerals = ['V', 'VI', 'VII', 'VIII'];
+
+function formatDate(dateStr: string) {
+  return new Date(dateStr).toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
+}
+---
+
+<BaseLayout title="Wyrmwood Palisades">
+  <main class="page-wrap">
+
+    <!-- ── FEATURED ── -->
+    <div class="featured">
+      <div class="feat-text">
+        <div class="feat-kicker">⚔ Featured Chronicle</div>
+        <h2 class="feat-title">{featured.data.title}</h2>
+        <p class="feat-body-text">{featured.data.excerpt}</p>
+        <div class="feat-panel-sm">
+          <WPMonogram size="sm" />
+          <span class="panel-border-label">{catLabel[featured.data.category]} · Monthly Spotlight</span>
+        </div>
+        <div class="feat-foot">
+          <span class="feat-date">
+            {formatDate(featured.data.date)}
+            <Rating category={featured.data.category} score={featured.data.rating} />
+          </span>
+          <a href={`/reviews/${featured.id}`} class="btn-read">Read the Review</a>
+        </div>
+      </div>
+
+      <div class="feat-panel-lg">
+        <WPMonogram size="lg" />
+        <div class="panel-caption">
+          {featured.data.spotlight ? 'March Spotlight — ' : ''}{catLabel[featured.data.category]} Feature
+        </div>
+      </div>
+    </div>
+
+    <!-- ── RECENT REVIEWS ── -->
+    <SectionLabel text="Recent Reviews" />
+    <div class="card-grid">
+      {cardItems.map((review, i) => (
+        <a href={`/reviews/${review.id}`} class="card" style="text-decoration:none;color:inherit;">
+          <div class="card-num">{romanCardNumerals[i]}</div>
+          <div class="card-cat">{catLabel[review.data.category]}</div>
+          <div class="card-title">{review.data.title}</div>
+          <p class="card-body">{review.data.excerpt}</p>
+          <span class="card-date">
+            {formatDate(review.data.date)}
+            <Rating category={review.data.category} score={review.data.rating} />
+          </span>
+        </a>
+      ))}
+    </div>
+
+    <!-- ── MORE REVIEWS ── -->
+    <SectionLabel text="More Reviews" />
+    <div class="bottom-grid">
+      <div class="mini-list">
+        {miniItems.map((review, i) => (
+          <a href={`/reviews/${review.id}`} class="mini-item" style="text-decoration:none;color:inherit;">
+            <div class="mini-index">{romanMiniNumerals[i]}</div>
+            <div class="mini-body">
+              <div class="mini-cat">{catLabel[review.data.category]}</div>
+              <div class="mini-title">{review.data.title}</div>
+              <div class="mini-date">
+                {formatDate(review.data.date)}
+                <Rating category={review.data.category} score={review.data.rating} />
+              </div>
+            </div>
+          </a>
+        ))}
+      </div>
+
+      <div class="sigil-block">
+        <div class="tags-section">
+          <div class="tags-label">Index of the Grimoire</div>
+          <div class="tag-cloud">
+            {allTags.map(tag => (
+              <Tag label={tag} href={`/reviews?tag=${encodeURIComponent(tag)}`} />
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</BaseLayout>
+
+<style>
+  /* ── FEATURED ── */
+  .featured {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2.5rem;
+    margin-bottom: 2.75rem;
+  }
+  @media (max-width: 640px) { .featured { grid-template-columns: 1fr; } }
+
+  .feat-kicker {
+    font-family: 'Cinzel', serif;
+    font-size: 0.6rem; letter-spacing: 0.38em;
+    text-transform: uppercase; color: var(--teal-lt);
+    margin-bottom: 0.625rem;
+    display: flex; align-items: center; gap: 0.625rem;
+  }
+  .feat-kicker::after { content: ''; flex: 1; height: 1px; background: var(--red-dim); }
+
+  .feat-title {
+    font-family: 'Cinzel Decorative', serif;
+    font-size: clamp(1.6rem, 4.5vw, 2.6rem);
+    font-weight: 700; line-height: 1.1;
+    color: var(--white);
+    text-shadow:
+      0.0625rem 0.0625rem 0 rgba(0,0,0,0.2),
+      0 0 1.25rem rgba(196,148,122,0.1);
+    margin-bottom: 1.125rem;
+    letter-spacing: 0.02em;
+  }
+
+  .feat-body-text {
+    font-family: 'IM Fell English', serif;
+    font-size: 0.98rem; line-height: 1.85;
+    color: var(--white-dim);
+    margin-bottom: 1.375rem;
+    font-style: italic;
+  }
+
+  .feat-panel-sm {
+    border: 1px solid var(--red-dim);
+    outline: 0.1875rem solid var(--black);
+    outline-offset: -0.375rem;
+    box-shadow: inset 0 0 0 0.4375rem var(--black), inset 0 0 0 0.5rem var(--red-dim);
+    background: var(--panel-bg);
+    height: 10.9375rem;
+    position: relative; overflow: hidden;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .feat-panel-sm::before {
+    content: '';
+    position: absolute; inset: 0;
+    background:
+      radial-gradient(ellipse 75% 55% at 50% 30%, rgba(138,180,176,0.3) 0%, transparent 65%),
+      radial-gradient(ellipse 85% 50% at 50% 100%, rgba(196,148,122,0.4) 0%, rgba(180,120,100,0.15) 45%, transparent 65%),
+      radial-gradient(ellipse 50% 40% at 15% 55%, rgba(200,168,120,0.2) 0%, transparent 50%);
+  }
+  .feat-panel-sm::after {
+    content: '';
+    position: absolute; inset: 0;
+    background-image: radial-gradient(circle, rgba(196,148,122,0.07) 1px, transparent 1px);
+    background-size: 0.4375rem 0.4375rem;
+  }
+  :global([data-theme="light"]) .feat-panel-sm::before {
+    background:
+      radial-gradient(ellipse 75% 55% at 50% 30%, rgba(100,148,148,0.18) 0%, transparent 65%),
+      radial-gradient(ellipse 85% 50% at 50% 100%, rgba(160,100,70,0.25) 0%, transparent 65%),
+      radial-gradient(ellipse 50% 40% at 15% 55%, rgba(160,130,90,0.12) 0%, transparent 50%);
+  }
+
+  .panel-border-label {
+    position: absolute; bottom: 0.875rem; left: 0.875rem;
+    font-family: 'Cinzel', serif;
+    font-size: 0.55rem; letter-spacing: 0.25em;
+    text-transform: uppercase; color: var(--white-dim);
+    z-index: 2;
+  }
+
+  .feat-foot {
+    display: flex; justify-content: space-between; align-items: center;
+    padding-top: 0.875rem; margin-top: 0.875rem;
+  }
+  .feat-date {
+    font-family: 'IM Fell English', serif;
+    font-style: italic; font-size: 0.78rem;
+    color: var(--red-dim); letter-spacing: 0.05em;
+  }
+  .btn-read {
+    font-family: 'Cinzel', serif;
+    font-size: 0.62rem; letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--black); background: var(--white);
+    text-decoration: none;
+    padding: 0.375rem 1rem;
+    border: 1px solid var(--white);
+    transition: background 0.2s, color 0.2s, border-color 0.2s;
+  }
+  .btn-read:hover { background: var(--red-dim); border-color: var(--red-dim); color: var(--white); }
+
+  .feat-panel-lg {
+    border: 1px solid var(--red-dim);
+    box-shadow: inset 0 0 0 0.4375rem var(--black), inset 0 0 0 0.5rem var(--red-dim);
+    background: var(--panel-bg);
+    min-height: 26.25rem;
+    position: relative; overflow: hidden;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .feat-panel-lg::before {
+    content: '';
+    position: absolute; inset: 0;
+    background:
+      radial-gradient(ellipse 80% 55% at 50% 15%, rgba(138,180,176,0.35) 0%, rgba(100,148,148,0.1) 50%, transparent 70%),
+      radial-gradient(ellipse 55% 40% at 15% 50%, rgba(138,180,176,0.2) 0%, transparent 55%),
+      radial-gradient(ellipse 100% 50% at 50% 100%, rgba(196,148,122,0.55) 0%, rgba(180,110,90,0.2) 40%, transparent 62%),
+      radial-gradient(ellipse 60% 35% at 50% 58%, rgba(20,18,18,0.75) 0%, transparent 70%);
+  }
+  .feat-panel-lg::after {
+    content: '';
+    position: absolute; inset: 0;
+    background-image: radial-gradient(circle, rgba(196,148,122,0.06) 1px, transparent 1px);
+    background-size: 0.4375rem 0.4375rem;
+    pointer-events: none;
+  }
+  :global([data-theme="light"]) .feat-panel-lg::before {
+    background:
+      radial-gradient(ellipse 80% 55% at 50% 15%, rgba(100,148,148,0.2) 0%, rgba(80,120,120,0.06) 50%, transparent 70%),
+      radial-gradient(ellipse 55% 40% at 15% 50%, rgba(100,148,148,0.12) 0%, transparent 55%),
+      radial-gradient(ellipse 100% 50% at 50% 100%, rgba(160,100,70,0.3) 0%, rgba(140,80,50,0.1) 40%, transparent 62%),
+      radial-gradient(ellipse 60% 35% at 50% 58%, rgba(220,205,185,0.5) 0%, transparent 70%);
+  }
+
+  .panel-caption {
+    position: absolute; bottom: 0; left: 0; right: 0;
+    background: rgba(0,0,0,0.7);
+    border-top: 1px solid var(--red-dim);
+    padding: 0.625rem 1rem;
+    font-family: 'IM Fell English', serif;
+    font-style: italic; font-size: 0.85rem;
+    color: var(--white-dim); z-index: 2;
+  }
+  :global([data-theme="light"]) .panel-caption {
+    background: rgba(232,224,204,0.92);
+  }
+
+  /* ── CARD GRID ── */
+  .card-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    border: 1px solid var(--red-dim); border-top: none;
+    margin-bottom: 2.75rem;
+  }
+  @media (max-width: 600px) { .card-grid { grid-template-columns: 1fr; } }
+
+  .card {
+    padding: 1.375rem 1.75rem;
+    border-right: 1px solid var(--red-dim);
+    position: relative; overflow: hidden;
+    transition: background 0.2s;
+  }
+  .card:last-child { border-right: none; }
+  .card:hover { background: rgba(196,148,122,0.04); }
+  .card::after {
+    content: '';
+    position: absolute; inset: 0; pointer-events: none;
+    background-image: radial-gradient(circle, rgba(196,148,122,0.05) 1px, transparent 1px);
+    background-size: 0.4375rem 0.4375rem;
+    opacity: 0; transition: opacity 0.3s;
+  }
+  .card:hover::after { opacity: 1; }
+
+  @media (max-width: 640px) {
+    .card-grid .card:nth-child(2) { border-top: 1px solid var(--red-dim); border-bottom: 1px solid var(--red-dim); }
+    .card { border-right: none !important; }
+  }
+
+  .card-num {
+    font-family: 'Cinzel', serif;
+    font-size: 3.5rem; font-weight: 700; letter-spacing: 0.05em;
+    color: rgba(196,148,122,0.22);
+    position: absolute; top: 0.5rem; right: 0.75rem;
+    line-height: 1; pointer-events: none;
+  }
+  .card-cat {
+    font-family: 'Cinzel', serif;
+    font-size: 0.58rem; letter-spacing: 0.32em;
+    text-transform: uppercase; color: var(--teal-lt);
+    margin-bottom: 0.5625rem;
+  }
+  .card-title {
+    font-family: 'Cinzel Decorative', serif;
+    font-size: 1rem; font-weight: 700;
+    line-height: 1.2; letter-spacing: 0.01em; color: var(--white);
+    text-shadow: 0.0625rem 0.0625rem 0 rgba(0,0,0,0.2), 0 0 0.9375rem rgba(138,180,176,0.08);
+    margin-bottom: 0.6875rem;
+  }
+  .card-body {
+    font-family: 'IM Fell English', serif;
+    font-style: italic; font-size: 0.9rem;
+    line-height: 1.78; color: var(--white-dim);
+    margin-bottom: 1rem;
+  }
+  .card-date {
+    font-family: 'IM Fell English', serif;
+    font-style: italic; font-size: 0.72rem;
+    color: var(--amber);
+    padding-top: 0.625rem; display: block;
+  }
+
+  /* ── BOTTOM GRID ── */
+  .bottom-grid {
+    display: grid;
+    grid-template-columns: 1fr 18.75rem;
+    border-left: 1px solid var(--red-dim);
+    border-right: 1px solid var(--red-dim);
+    border-bottom: 1px solid var(--red-dim);
+    margin-bottom: 2.75rem;
+  }
+  @media (max-width: 640px) {
+    .bottom-grid { grid-template-columns: 1fr; }
+    .mini-list { border-right: none !important; border-bottom: 1px solid var(--red-dim); }
+  }
+
+  .mini-list { border-right: 1px solid var(--red-dim); }
+
+  .mini-item {
+    display: flex;
+    border-bottom: 1px solid rgba(196,148,122,0.15);
+    cursor: pointer; transition: background 0.2s;
+  }
+  .mini-item:last-child { border-bottom: none; }
+  .mini-item:hover { background: rgba(196,148,122,0.05); }
+
+  .mini-index {
+    font-family: 'Cinzel', serif;
+    font-size: 1.1rem; font-weight: 700;
+    color: rgba(196,148,122,0.35);
+    padding: 0.875rem 0.75rem 0.875rem 1.125rem;
+    line-height: 1.3; flex-shrink: 0;
+    letter-spacing: 0.05em;
+  }
+  .mini-body { padding: 0.8125rem 1.125rem 0.8125rem 0; }
+  .mini-cat {
+    font-family: 'Cinzel', serif;
+    font-size: 0.55rem; letter-spacing: 0.3em;
+    text-transform: uppercase; color: var(--teal-lt);
+    margin-bottom: 0.1875rem;
+  }
+  .mini-title {
+    font-family: 'Crimson Pro', serif;
+    font-size: 0.95rem; font-weight: 600;
+    color: var(--white); line-height: 1.3; margin-bottom: 0.1875rem;
+  }
+  .mini-date {
+    font-family: 'IM Fell English', serif;
+    font-style: italic; font-size: 0.7rem;
+    color: var(--amber);
+  }
+
+  .sigil-block { display: flex; flex-direction: column; }
+  .tags-section { padding: 1.125rem; }
+  .tags-label {
+    font-family: 'Cinzel', serif;
+    font-size: 0.58rem; letter-spacing: 0.3em;
+    text-transform: uppercase; color: var(--teal-lt);
+    margin-bottom: 0.625rem;
+  }
+  .tag-cloud { display: flex; flex-wrap: wrap; gap: 0.3125rem; }
+
+  @media (max-width: 640px) {
+    .feat-foot { margin-bottom: 2.75rem; }
+  }
+</style>

@@ -1,0 +1,55 @@
+---
+const currentMonth = new Date().toLocaleString('en-US', { month: 'long' });
+
+const navLinks = [
+  { label: 'All Reviews', href: '/reviews' },
+  { label: 'Music',       href: '/reviews/music' },
+  { label: 'Fiction',     href: '/reviews/fiction' },
+  { label: 'Tabletop',    href: '/reviews/tabletop' },
+  { label: 'Spotlight',   href: '/reviews/spotlight' },
+];
+
+const currentPath = Astro.url.pathname.replace(/\/$/, '') || '/';
+
+function isActive(href: string): boolean {
+  const path = href.replace(/\/$/, '') || '/';
+  return currentPath === path;
+}
+---
+
+<header>
+  <div class="top-bar">
+    <div class="top-bar-label">For Rogues, Riff-Lords, and Realm-Seekers</div>
+    <div class="top-bar-num">Vol. I · XII</div>
+  </div>
+
+  <div class="header-body">
+    <div>
+      <a href="/" style="text-decoration:none;">
+        <h1 class="site-title">Wyrmwood<br />Palisades</h1>
+      </a>
+    </div>
+    <button
+      class="hamburger"
+      id="hamburger"
+      aria-label="Toggle navigation"
+      onclick="toggleNav()"
+    >
+      <span></span><span></span><span></span>
+    </button>
+    <nav class="header-nav-block" id="header-nav">
+      {navLinks.map(link => <a href={link.href} class={isActive(link.href) ? 'active' : ''}>{link.label}</a>)}
+    </nav>
+  </div>
+
+  <p class="header-tagline">
+    Reviews of epic music, high fantasy fiction, and tabletop RPGs — for anyone who has argued about
+    the best fantasy novel, worn out a cassette tape, or rolled dice until midnight&nbsp;.&nbsp;.&nbsp;.
+  </p>
+
+  <nav class="sub-nav">
+    {navLinks.map(link => <a href={link.href} class={isActive(link.href) ? 'active' : ''}>{link.label}</a>)}
+    <div class="spacer"></div>
+    <div class="issue">{currentMonth} Spotlight</div>
+  </nav>
+</header>

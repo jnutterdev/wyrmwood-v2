@@ -1,0 +1,29 @@
+---
+interface Props {
+  size?: 'sm' | 'lg';
+  class?: string;
+}
+
+const { size = 'lg', class: className } = Astro.props;
+
+const width  = size === 'lg' ? '10rem'    : '6.25rem';
+const height = size === 'lg' ? '9rem'     : '5.625rem';
+const shadow = size === 'lg' ? '0 0 1.125rem rgba(232,224,204,0.15)' : '0 0 0.625rem rgba(232,224,204,0.12)';
+---
+
+<svg
+  viewBox="0 0 160 144"
+  fill="none"
+  xmlns="http://www.w3.org/2000/svg"
+  style={`width:${width};height:${height};position:relative;z-index:1;opacity:0.5;filter:drop-shadow(${shadow});`}
+  class={className}
+>
+  <circle cx="80" cy="72" r="66" stroke="var(--red)" stroke-width="1" fill="none" opacity="0.35"/>
+  <circle cx="80" cy="72" r="60" stroke="#e8e0cc" stroke-width="0.6" fill="none" opacity="0.2"/>
+  <path d="M80 6 L84 12 L80 18 L76 12 Z" fill="var(--red)" opacity="0.7"/>
+  <path d="M80 126 L84 132 L80 138 L76 132 Z" fill="var(--red)" opacity="0.7"/>
+  <path d="M14 72 L20 68 L26 72 L20 76 Z" fill="var(--red)" opacity="0.7"/>
+  <path d="M134 72 L140 68 L146 72 L140 76 Z" fill="var(--red)" opacity="0.7"/>
+  <text x="80" y="98" font-family="UnifrakturMaguntia, cursive" font-size="72" fill="var(--white)" text-anchor="middle" opacity="0.9" letter-spacing="-4">WP</text>
+  <line x1="30" y1="108" x2="130" y2="108" stroke="var(--red)" stroke-width="0.8" opacity="0.5"/>
+</svg>

@@ -1,0 +1,861 @@
+---
+import { getCollection, render } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import WPMonogram from '../../components/WPMonogram.astro';
+import Rating from '../../components/Rating.astro';
+import Tag from '../../components/Tag.astro';
+import SectionLabel from '../../components/SectionLabel.astro';
+
+export async function getStaticPaths() {
+  const reviews = await getCollection('reviews');
+  return reviews.map(entry => ({
+    params: { slug: entry.id },
+    props: { entry },
+  }));
+}
+
+const { entry } = Astro.props;
+const { Content } = await render(entry);
+const { title, category, date, excerpt, rating, tags, byline, readTime } = entry.data;
+
+// All reviews sorted by date desc
+const allReviews = (await getCollection('reviews')).sort(
+  (a, b) => new Date(b.data.date).getTime() - new Date(a.data.date).getTime()
+);
+
+const currentIdx = allReviews.findIndex(r => r.id === entry.id);
+const prevReview = currentIdx < allReviews.length - 1 ? allReviews[currentIdx + 1] : null;
+const nextReview = currentIdx > 0 ? allReviews[currentIdx - 1] : null;
+
+// Related reviews: same category, exclude current, up to 3
+const related = allReviews
+  .filter(r => r.id !== entry.id && r.data.category === category)
+  .slice(0, 3);
+
+// More reviews for card grid: exclude current + related, up to 3
+const moreReviews = allReviews
+  .filter(r => r.id !== entry.id && !related.some(rel => rel.id === r.id))
+  .slice(0, 3);
+
+// Collect all unique tags
+const allTags = [...new Set(allReviews.flatMap(r => r.data.tags))].slice(0, 12);
+
+function toRoman(n: number): string {
+  const vals = [1000, 900, 500, 400, 100, 90, 50, 40, 10, 9, 5, 4, 1];
+  const syms = ['M', 'CM', 'D', 'CD', 'C', 'XC', 'L', 'XL', 'X', 'IX', 'V', 'IV', 'I'];
+  let result = '';
+  for (let i = 0; i < vals.length; i++) {
+    while (n >= vals[i]) { result += syms[i]; n -= vals[i]; }
+  }
+  return result;
+}
+
+function formatDate(dateStr: string): string {
+  const d = new Date(dateStr + 'T00:00:00');
+  const month = d.toLocaleString('en-US', { month: 'long' });
+  return `${month} ${toRoman(d.getFullYear())}`;
+}
+
+const formattedDate = formatDate(date);
+
+const authorName = byline ? byline.replace(/^By\s+/, '').split(/\s*·\s*/)[0] : 'The Editor';
+const authorGlyph = authorName.charAt(0).toUpperCase();
+
+const catDisplay = category.charAt(0).toUpperCase() + category.slice(1);
+const firstTag = tags[0] ? tags[0].replace(/-/g, ' ') : '';
+const firstTagDisplay = firstTag.charAt(0).toUpperCase() + firstTag.slice(1);
+
+const iconLabels: Record<string, string> = {
+  music: 'Skulls',
+  fiction: 'Khandas',
+  tabletop: 'Dice',
+};
+
+function cardDate(dateStr: string): string {
+  const d = new Date(dateStr + 'T00:00:00');
+  const month = d.toLocaleString('en-US', { month: 'short' });
+  return `${month} ${toRoman(d.getFullYear())}`;
+}
+
+const cardNumerals = ['II', 'III', 'IV', 'V'];
+---
+
+<BaseLayout title={title} description={excerpt}>
+  <main class="page-wrap">
+
+    <!-- Breadcrumb -->
+    <nav class="article-breadcrumb" aria-label="Breadcrumb">
+      <a href="/">All Reviews</a>
+      <span class="bc-sep">◆</span>
+      <a href={`/reviews?category=${category}`}>{catDisplay}</a>
+      <span class="bc-sep">◆</span>
+      <span class="bc-current">{title}</span>
+    </nav>
+
+    <!-- Hero panel -->
+    <div class="article-hero" role="img" aria-label={`Hero panel for ${title}`}>
+      <WPMonogram size="lg" class="hero-wp" />
+      <div class="article-hero-caption">
+        <span>Artwork placeholder — Charcoal edition · NightCafe generation pending</span>
+        <span class="article-hero-caption-cat">{catDisplay} · {firstTagDisplay}</span>
+      </div>
+    </div>
+
+    <!-- Meta bar -->
+    <div class="article-meta-bar" role="complementary" aria-label="Article metadata">
+      <div class="article-meta-item cat">{catDisplay}</div>
+      {tags.slice(0, 2).map(t => (
+        <div class="article-meta-item">{t.replace(/-/g, ' ')}</div>
+      ))}
+      <div class="article-meta-item">{formattedDate}</div>
+      {readTime && <div class="article-meta-item">{readTime}</div>}
+      <div class="article-meta-item rating-bar">
+        <Rating category={category} score={rating} />
+        <span class="rating-bar-label">{rating} / 5</span>
+      </div>
+    </div>
+
+    <!-- Two-column layout -->
+    <div class="article-layout">
+
+      <!-- Main article column -->
+      <article class="article-main">
+        <div class="article-kicker">
+          ⚔ {catDisplay} Review · {firstTagDisplay}
+        </div>
+
+        <h1 class="article-title">{title}</h1>
+
+        {byline && <div class="article-byline">{byline}</div>}
+
+        <p class="article-intro">{excerpt}</p>
+
+        <div class="article-break">✦ &nbsp;&nbsp; ✦ &nbsp;&nbsp; ✦</div>
+
+        <div class="article-body">
+          <Content />
+        </div>
+
+        <div class="article-break">✦ &nbsp;&nbsp; ✦ &nbsp;&nbsp; ✦</div>
+
+        <!-- Verdict panel -->
+        <div class="verdict-panel">
+          <div class="verdict-header">The Verdict</div>
+          <div class="verdict-rating">
+            <Rating category={category} score={rating} />
+            <span class="verdict-rating-label">{rating} of 5 {iconLabels[category]}</span>
+          </div>
+          <p class="verdict-text">{excerpt}</p>
+          <div class="verdict-filed">
+            <span class="verdict-filed-label">File Under</span>
+            <div class="verdict-tags">
+              {tags.map(t => (
+                <Tag label={t.replace(/-/g, ' ')} href={`/reviews?tag=${t}`} />
+              ))}
+            </div>
+          </div>
+        </div>
+
+        <!-- Prev / Next nav -->
+        <nav class="article-nav" aria-label="Article navigation">
+          {prevReview ? (
+            <a href={`/reviews/${prevReview.id}`} class="article-nav-item prev">
+              <span class="article-nav-dir">← Previous</span>
+              <span class="article-nav-title">{prevReview.data.title}</span>
+            </a>
+          ) : (
+            <span class="article-nav-item prev disabled">
+              <span class="article-nav-dir">← Previous</span>
+              <span class="article-nav-title">—</span>
+            </span>
+          )}
+          {nextReview ? (
+            <a href={`/reviews/${nextReview.id}`} class="article-nav-item next">
+              <span class="article-nav-dir">Next →</span>
+              <span class="article-nav-title">{nextReview.data.title}</span>
+            </a>
+          ) : (
+            <span class="article-nav-item next disabled">
+              <span class="article-nav-dir">Next →</span>
+              <span class="article-nav-title">—</span>
+            </span>
+          )}
+        </nav>
+      </article>
+
+      <!-- Sidebar -->
+      <aside class="article-sidebar" aria-label="Article sidebar">
+
+        <!-- Author block -->
+        <div class="sidebar-block">
+          <div class="sidebar-label">The Chronicler</div>
+          <div class="author-monogram">
+            <span class="author-monogram-glyph">{authorGlyph}</span>
+          </div>
+          <div class="author-name">{authorName}</div>
+          <p class="author-bio">
+            Keeper of the Palisades. Writes about heavy music, high fantasy, and the spaces
+            where the two meet. Has rolled dice until midnight more times than is strictly advisable.
+          </p>
+        </div>
+
+        <!-- Related reviews -->
+        {related.length > 0 && (
+          <div class="sidebar-block">
+            <div class="sidebar-label">Related Chronicles</div>
+            {related.map(r => (
+              <a href={`/reviews/${r.id}`} class="sidebar-review">
+                <span class="sidebar-review-cat">{r.data.category.charAt(0).toUpperCase() + r.data.category.slice(1)} · {r.data.tags[0]?.replace(/-/g, ' ')}</span>
+                <span class="sidebar-review-title">{r.data.title}</span>
+                <span class="sidebar-review-date">
+                  {cardDate(r.data.date)} · <Rating category={r.data.category} score={r.data.rating} />
+                </span>
+              </a>
+            ))}
+          </div>
+        )}
+
+        <!-- Tag cloud -->
+        <div class="sidebar-block">
+          <div class="sidebar-label">Index of the Grimoire</div>
+          <div class="sidebar-tags">
+            {allTags.map(t => (
+              <Tag label={t.replace(/-/g, ' ')} href={`/reviews?tag=${t}`} />
+            ))}
+          </div>
+        </div>
+
+      </aside>
+    </div>
+    <!-- /article-layout -->
+
+    <!-- More Reviews section -->
+    {moreReviews.length > 0 && (
+      <>
+        <SectionLabel text="More Reviews" />
+        <div class="card-grid">
+          {moreReviews.map((r, i) => (
+            <a href={`/reviews/${r.id}`} class="card">
+              <div class="card-num">{cardNumerals[i] ?? toRoman(i + 2)}</div>
+              <div class="card-cat">{r.data.category.charAt(0).toUpperCase() + r.data.category.slice(1)} · {r.data.tags[0]?.replace(/-/g, ' ')}</div>
+              <div class="card-title">{r.data.title}</div>
+              <p class="card-body">{r.data.excerpt}</p>
+              <span class="card-date">
+                {cardDate(r.data.date)} · <Rating category={r.data.category} score={r.data.rating} />
+              </span>
+            </a>
+          ))}
+        </div>
+      </>
+    )}
+
+  </main>
+</BaseLayout>
+
+<style>
+  /* ── Page wrap ── */
+  .page-wrap {
+    max-width: 63.75rem;
+    margin: 0 auto;
+    padding: 2.5rem 2.25rem 3.75rem;
+    position: relative;
+    z-index: 2;
+    animation: revealUp 0.7s ease 0.45s both;
+  }
+
+  /* ── Breadcrumb ── */
+  .article-breadcrumb {
+    display: flex;
+    align-items: center;
+    gap: 0.625rem;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+  }
+  .article-breadcrumb a {
+    font-family: 'Cinzel', serif;
+    font-size: 0.58rem;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    color: var(--white-dim);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+  .article-breadcrumb a:hover {
+    color: var(--teal-lt);
+  }
+  .bc-sep {
+    color: var(--red-dim);
+    font-size: 0.5rem;
+  }
+  .bc-current {
+    font-family: 'Cinzel', serif;
+    font-size: 0.58rem;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--teal-lt);
+  }
+
+  /* ── Hero panel ── */
+  .article-hero {
+    border: 1px solid var(--red-dim);
+    box-shadow:
+      inset 0 0 0 7px var(--black),
+      inset 0 0 0 8px var(--red-dim);
+    background: var(--panel-bg);
+    height: 21.25rem;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  @media (max-width: 640px) {
+    .article-hero { height: 13.75rem; }
+  }
+  .article-hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 80% 50% at 50% 15%, rgba(138,180,176,0.3) 0%, rgba(100,148,148,0.08) 50%, transparent 68%),
+      radial-gradient(ellipse 55% 40% at 10% 50%, rgba(138,180,176,0.15) 0%, transparent 55%),
+      radial-gradient(ellipse 100% 55% at 50% 100%, rgba(200,168,120,0.5) 0%, rgba(160,110,80,0.2) 45%, transparent 65%),
+      radial-gradient(ellipse 65% 38% at 50% 60%, rgba(20,18,18,0.82) 0%, transparent 72%);
+  }
+  .article-hero::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: radial-gradient(circle, rgba(196,148,122,0.05) 1px, transparent 1px);
+    background-size: 7px 7px;
+    pointer-events: none;
+  }
+  .article-hero :global(.hero-wp) {
+    position: relative;
+    z-index: 1;
+    opacity: 0.42;
+    filter: drop-shadow(0 0 18px rgba(232, 224, 204, 0.14));
+    animation: breathe 5s ease-in-out infinite alternate;
+  }
+  .article-hero-caption {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: rgba(0, 0, 0, 0.72);
+    border-top: 1px solid var(--red-dim);
+    padding: 0.625rem 1.125rem;
+    font-family: 'IM Fell English', serif;
+    font-style: italic;
+    font-size: 0.82rem;
+    color: var(--white-dim);
+    z-index: 2;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+  }
+  .article-hero-caption-cat {
+    font-family: 'Cinzel', serif;
+    font-style: normal;
+    font-size: 0.55rem;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--teal-lt);
+    flex-shrink: 0;
+  }
+
+  /* ── Meta bar ── */
+  .article-meta-bar {
+    display: flex;
+    align-items: stretch;
+    border: 1px solid var(--red-dim);
+    border-top: none;
+    background: var(--near-black);
+    margin-bottom: 2.5rem;
+    overflow: hidden;
+    flex-wrap: wrap;
+  }
+  .article-meta-item {
+    font-family: 'Cinzel', serif;
+    font-size: 0.58rem;
+    letter-spacing: 0.26em;
+    text-transform: uppercase;
+    color: var(--white-dim);
+    padding: 0.5625rem 1.125rem;
+    border-right: 1px solid var(--red-dim);
+    display: flex;
+    align-items: center;
+    white-space: nowrap;
+  }
+  .article-meta-item:last-child { border-right: none; }
+  .article-meta-item.cat { color: var(--teal-lt); }
+  .article-meta-item.rating-bar {
+    margin-left: auto;
+    border-right: none;
+    border-left: 1px solid var(--red-dim);
+    gap: 0.5rem;
+  }
+  .rating-bar-label {
+    font-family: 'Cinzel', serif;
+    font-size: 0.52rem;
+    letter-spacing: 0.2em;
+    color: var(--white-dim);
+  }
+
+  /* ── Two-column layout ── */
+  .article-layout {
+    display: grid;
+    grid-template-columns: 1fr 17.75rem;
+    gap: 2rem;
+    margin-bottom: 3.25rem;
+    align-items: start;
+  }
+  @media (max-width: 780px) {
+    .article-layout { grid-template-columns: 1fr; }
+  }
+
+  /* ── Article main column ── */
+  .article-kicker {
+    font-family: 'Cinzel', serif;
+    font-size: 0.6rem;
+    letter-spacing: 0.38em;
+    text-transform: uppercase;
+    color: var(--teal-lt);
+    margin-bottom: 0.75rem;
+    display: flex;
+    align-items: center;
+    gap: 0.625rem;
+  }
+  .article-kicker::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--red-dim);
+  }
+  .article-title {
+    font-family: 'Cinzel Decorative', serif;
+    font-size: clamp(1.7rem, 3.8vw, 2.7rem);
+    font-weight: 700;
+    line-height: 1.1;
+    letter-spacing: 0.02em;
+    color: var(--white);
+    text-shadow:
+      1px 1px 0 rgba(0,0,0,0.2),
+      0 0 20px rgba(196,148,122,0.1);
+    margin-bottom: 1rem;
+  }
+  .article-byline {
+    font-family: 'IM Fell English', serif;
+    font-style: italic;
+    font-size: 0.8rem;
+    color: var(--red-dim);
+    margin-bottom: 1.625rem;
+    display: flex;
+    align-items: center;
+    gap: 0.625rem;
+  }
+  .article-byline::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(to right, var(--red-dim), transparent);
+  }
+  .article-intro {
+    font-family: 'IM Fell English', serif;
+    font-style: italic;
+    font-size: 1.06rem;
+    line-height: 1.92;
+    color: var(--white);
+    margin-bottom: 1.625rem;
+    padding-bottom: 1.625rem;
+    border-bottom: 1px solid rgba(196, 148, 122, 0.2);
+  }
+  .article-break {
+    text-align: center;
+    color: var(--red-dim);
+    font-size: 0.82rem;
+    letter-spacing: 0.6em;
+    margin: 1.875rem 0;
+    user-select: none;
+  }
+
+  /* Body content from markdown */
+  .article-body :global(p) {
+    font-family: 'IM Fell English', serif;
+    font-size: 0.97rem;
+    line-height: 1.95;
+    color: var(--white-dim);
+    margin-bottom: 1.375rem;
+  }
+  .article-body :global(p:first-of-type)::first-letter {
+    font-family: 'UnifrakturMaguntia', cursive;
+    font-size: 4rem;
+    line-height: 0.72;
+    float: left;
+    margin-right: 0.5625rem;
+    margin-top: 0.3125rem;
+    color: var(--red);
+    text-shadow: 1px 1px 0 rgba(0,0,0,0.2);
+  }
+  .article-body :global(h2) {
+    font-family: 'Cinzel', serif;
+    font-size: 0.72rem;
+    letter-spacing: 0.32em;
+    text-transform: uppercase;
+    color: var(--teal-lt);
+    margin: 2rem 0 0.875rem;
+  }
+  .article-body :global(em) {
+    font-style: italic;
+  }
+  .article-body :global(strong) {
+    font-weight: 600;
+    color: var(--white);
+  }
+
+  /* ── Verdict panel ── */
+  .verdict-panel {
+    border: 1px solid var(--red-dim);
+    box-shadow:
+      inset 0 0 0 5px var(--black),
+      inset 0 0 0 6px var(--red-dim);
+    background: var(--panel-bg);
+    padding: 1.625rem 1.625rem 1.375rem;
+    margin-top: 2.125rem;
+    position: relative;
+    overflow: hidden;
+  }
+  .verdict-panel::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 80% 55% at 50% 100%, rgba(196,148,122,0.1) 0%, transparent 65%),
+      radial-gradient(ellipse 60% 40% at 50% 0%, rgba(138,180,176,0.07) 0%, transparent 60%);
+    pointer-events: none;
+  }
+  .verdict-panel::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: radial-gradient(circle, rgba(196,148,122,0.04) 1px, transparent 1px);
+    background-size: 7px 7px;
+    pointer-events: none;
+  }
+  .verdict-header {
+    font-family: 'UnifrakturMaguntia', cursive;
+    font-size: 1.8rem;
+    color: var(--teal-lt);
+    text-shadow:
+      1px 1px 0 rgba(0,0,0,0.2),
+      0 0 15px rgba(138,180,176,0.2);
+    margin-bottom: 0.75rem;
+    position: relative;
+    z-index: 1;
+  }
+  .verdict-rating {
+    display: flex;
+    align-items: center;
+    gap: 0.3125rem;
+    margin-bottom: 1.125rem;
+    position: relative;
+    z-index: 1;
+  }
+  .verdict-rating :global(.rating i) {
+    font-size: 1.1rem !important;
+    opacity: 0.9;
+  }
+  .verdict-rating-label {
+    font-family: 'Cinzel', serif;
+    font-size: 0.56rem;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--white-dim);
+    margin-left: 0.625rem;
+  }
+  .verdict-text {
+    font-family: 'IM Fell English', serif;
+    font-style: italic;
+    font-size: 0.95rem;
+    line-height: 1.88;
+    color: var(--white-dim);
+    margin-bottom: 1.25rem;
+    padding-bottom: 1.25rem;
+    border-bottom: 1px solid rgba(196, 148, 122, 0.2);
+    position: relative;
+    z-index: 1;
+  }
+  .verdict-filed {
+    display: flex;
+    align-items: baseline;
+    gap: 0.875rem;
+    flex-wrap: wrap;
+    position: relative;
+    z-index: 1;
+  }
+  .verdict-filed-label {
+    font-family: 'Cinzel', serif;
+    font-size: 0.54rem;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--white-dim);
+    white-space: nowrap;
+  }
+  .verdict-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.3125rem;
+  }
+
+  /* ── Article prev/next nav ── */
+  .article-nav {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    border: 1px solid var(--red-dim);
+    margin-top: 2.25rem;
+    background: var(--red-dim);
+    gap: 1px;
+  }
+  @media (max-width: 480px) {
+    .article-nav { grid-template-columns: 1fr; }
+  }
+  .article-nav-item {
+    background: var(--black);
+    padding: 1rem 1.25rem;
+    text-decoration: none;
+    transition: background 0.2s;
+    display: block;
+  }
+  .article-nav-item.disabled {
+    opacity: 0.35;
+    cursor: default;
+  }
+  .article-nav-item:not(.disabled):hover { background: var(--red-wash); }
+  .article-nav-item.next { text-align: right; }
+  .article-nav-dir {
+    font-family: 'Cinzel', serif;
+    font-size: 0.52rem;
+    letter-spacing: 0.35em;
+    text-transform: uppercase;
+    color: var(--red-dim);
+    display: block;
+    margin-bottom: 0.3125rem;
+  }
+  .article-nav-title {
+    font-family: 'Crimson Pro', serif;
+    font-size: 0.92rem;
+    font-weight: 600;
+    color: var(--white);
+    line-height: 1.3;
+  }
+
+  /* ── Sidebar ── */
+  .article-sidebar {
+    display: flex;
+    flex-direction: column;
+    border: 1px solid var(--red-dim);
+    position: sticky;
+    top: 1.5rem;
+  }
+  .sidebar-block {
+    border-bottom: 1px solid var(--red-dim);
+    padding: 1.125rem 1.125rem 1rem;
+  }
+  .sidebar-block:last-child { border-bottom: none; }
+  .sidebar-label {
+    font-family: 'Cinzel', serif;
+    font-size: 0.58rem;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--teal-lt);
+    margin-bottom: 0.875rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  .sidebar-label::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--red-dim);
+  }
+  .author-monogram {
+    width: 2.75rem;
+    height: 2.75rem;
+    border: 1px solid var(--red-dim);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 0.75rem;
+    background: var(--panel-bg);
+  }
+  .author-monogram-glyph {
+    font-family: 'UnifrakturMaguntia', cursive;
+    font-size: 1.4rem;
+    color: var(--red);
+    line-height: 1;
+  }
+  .author-name {
+    font-family: 'Cinzel', serif;
+    font-size: 0.7rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--white);
+    margin-bottom: 0.375rem;
+  }
+  .author-bio {
+    font-family: 'IM Fell English', serif;
+    font-style: italic;
+    font-size: 0.82rem;
+    line-height: 1.72;
+    color: var(--white-dim);
+  }
+  .sidebar-review {
+    display: block;
+    text-decoration: none;
+    border-bottom: 1px solid rgba(196, 148, 122, 0.15);
+    padding-bottom: 0.75rem;
+    margin-bottom: 0.75rem;
+    transition: opacity 0.2s;
+  }
+  .sidebar-review:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+    margin-bottom: 0;
+  }
+  .sidebar-review:hover { opacity: 0.75; }
+  .sidebar-review-cat {
+    font-family: 'Cinzel', serif;
+    font-size: 0.52rem;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--teal-lt);
+    display: block;
+    margin-bottom: 0.1875rem;
+  }
+  .sidebar-review-title {
+    font-family: 'Crimson Pro', serif;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--white);
+    line-height: 1.3;
+    display: block;
+    margin-bottom: 0.25rem;
+  }
+  .sidebar-review-date {
+    font-family: 'IM Fell English', serif;
+    font-style: italic;
+    font-size: 0.68rem;
+    color: var(--amber);
+    display: block;
+  }
+  .sidebar-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.3125rem;
+  }
+
+  /* ── More reviews card grid ── */
+  .card-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    border: 1px solid var(--red-dim);
+    border-top: none;
+    margin-bottom: 2.75rem;
+  }
+  @media (max-width: 600px) {
+    .card-grid { grid-template-columns: 1fr; }
+  }
+  .card {
+    padding: 1.375rem 1.25rem;
+    border-right: 1px solid var(--red-dim);
+    position: relative;
+    overflow: hidden;
+    transition: background 0.2s;
+    text-decoration: none;
+    color: inherit;
+    display: block;
+  }
+  .card:last-child { border-right: none; }
+  .card:hover { background: rgba(196, 148, 122, 0.04); }
+  .card::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background-image: radial-gradient(circle, rgba(196,148,122,0.05) 1px, transparent 1px);
+    background-size: 7px 7px;
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+  .card:hover::after { opacity: 1; }
+  .card-num {
+    font-family: 'Cinzel', serif;
+    font-size: 3.5rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    color: rgba(196, 148, 122, 0.22);
+    position: absolute;
+    top: 0.5rem;
+    right: 0.75rem;
+    line-height: 1;
+    pointer-events: none;
+  }
+  .card-cat {
+    font-family: 'Cinzel', serif;
+    font-size: 0.58rem;
+    letter-spacing: 0.32em;
+    text-transform: uppercase;
+    color: var(--teal-lt);
+    margin-bottom: 0.5625rem;
+  }
+  .card-title {
+    font-family: 'Cinzel Decorative', serif;
+    font-size: 1rem;
+    font-weight: 700;
+    line-height: 1.2;
+    letter-spacing: 0.01em;
+    color: var(--white);
+    text-shadow:
+      1px 1px 0 rgba(0,0,0,0.2),
+      0 0 15px rgba(138,180,176,0.08);
+    margin-bottom: 0.6875rem;
+  }
+  .card-body {
+    font-family: 'IM Fell English', serif;
+    font-style: italic;
+    font-size: 0.9rem;
+    line-height: 1.78;
+    color: var(--white-dim);
+    margin-bottom: 1rem;
+  }
+  .card-date {
+    font-family: 'IM Fell English', serif;
+    font-style: italic;
+    font-size: 0.72rem;
+    color: var(--amber);
+    padding-top: 0.625rem;
+    display: block;
+  }
+
+  /* ── Light mode overrides ── */
+  :global([data-theme="light"]) .article-hero-caption {
+    background: rgba(232, 220, 200, 0.93);
+  }
+  :global([data-theme="light"]) .article-hero::before {
+    background:
+      radial-gradient(ellipse 80% 50% at 50% 15%, rgba(100,148,148,0.18) 0%, transparent 68%),
+      radial-gradient(ellipse 55% 40% at 10% 50%, rgba(100,148,148,0.1) 0%, transparent 55%),
+      radial-gradient(ellipse 100% 55% at 50% 100%, rgba(160,100,70,0.28) 0%, rgba(140,80,50,0.1) 45%, transparent 65%),
+      radial-gradient(ellipse 65% 40% at 50% 60%, rgba(220,205,185,0.55) 0%, transparent 72%);
+  }
+  :global([data-theme="light"]) .verdict-panel {
+    box-shadow:
+      inset 0 0 0 5px var(--black),
+      inset 0 0 0 6px var(--red-dim);
+  }
+  :global([data-theme="light"]) .article-sidebar {
+    border-color: var(--red-dim);
+  }
+</style>

@@ -1,0 +1,22 @@
+---
+interface Props {
+  category: 'music' | 'fiction' | 'tabletop';
+  score: number;
+}
+
+const { category, score } = Astro.props;
+
+const iconMap = {
+  music:    'fa-skull',
+  fiction:  'fa-khanda',
+  tabletop: 'fa-dice-d20',
+};
+
+const icon = iconMap[category];
+---
+
+<span class="rating">
+  {Array.from({ length: score }).map(() => (
+    <i class={`fa-solid ${icon}`}></i>
+  ))}
+</span>

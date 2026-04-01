@@ -1,0 +1,553 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Rating from '../../components/Rating.astro';
+import Tag from '../../components/Tag.astro';
+import { getCollection } from 'astro:content';
+
+const allReviews = await getCollection('reviews');
+allReviews.sort((a, b) => new Date(b.data.date).getTime() - new Date(a.data.date).getTime());
+
+const musicCount    = allReviews.filter(r => r.data.category === 'music').length;
+const fictionCount  = allReviews.filter(r => r.data.category === 'fiction').length;
+const tabletopCount = allReviews.filter(r => r.data.category === 'tabletop').length;
+const totalCount    = allReviews.length;
+
+// Group by year
+const byYear = allReviews.reduce<Record<string, typeof allReviews>>((acc, r) => {
+  const year = new Date(r.data.date).getFullYear().toString();
+  (acc[year] ??= []).push(r);
+  return acc;
+}, {});
+const years = Object.keys(byYear).sort((a, b) => Number(b) - Number(a));
+
+const maxYearCount = Math.max(...years.map(y => byYear[y].length));
+
+const allTags = [...new Set(allReviews.flatMap(r => r.data.tags))].sort();
+
+const catIcon: Record<string, string> = {
+  music:    'fa-skull',
+  fiction:  'fa-khanda',
+  tabletop: 'fa-dice-d20',
+};
+const catLabel: Record<string, string> = {
+  music:    'Music',
+  fiction:  'Fiction',
+  tabletop: 'Tabletop',
+};
+
+// Roman numerals for first 20 entries
+const toRoman = (n: number) => {
+  const vals = [1000,900,500,400,100,90,50,40,10,9,5,4,1];
+  const syms = ['M','CM','D','CD','C','XC','L','XL','X','IX','V','IV','I'];
+  let result = '';
+  for (let i = 0; i < vals.length; i++) {
+    while (n >= vals[i]) { result += syms[i]; n -= vals[i]; }
+  }
+  return result;
+};
+
+function formatDateShort(dateStr: string) {
+  return new Date(dateStr).toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
+}
+
+// Convert year number to Roman numeral (e.g. 2026 → MMXXVI)
+function yearToRoman(year: number) {
+  return toRoman(year);
+}
+---
+
+<BaseLayout title="All Reviews">
+  <main class="page-wrap">
+
+    <!-- ── Archive Banner ── -->
+    <div class="archive-banner">
+      <div class="archive-banner-text">
+        <div class="archive-kicker">⚔ Complete Index</div>
+        <h1 class="archive-title">All Reviews</h1>
+        <p class="archive-desc">A complete chronicle of every review published in these palisades — catalogued in reverse order of discovery. Filter by discipline, or use the sidebar to navigate by year or subject matter.</p>
+      </div>
+
+      <div class="archive-stat-block" aria-label="Review counts by category">
+        <div class="stat-cell">
+          <span class="stat-icon"><i class="fa-solid fa-skull"></i></span>
+          <span class="stat-num">{musicCount}</span>
+          <span class="stat-label">Music</span>
+        </div>
+        <div class="stat-cell">
+          <span class="stat-icon"><i class="fa-solid fa-khanda"></i></span>
+          <span class="stat-num">{fictionCount}</span>
+          <span class="stat-label">Fiction</span>
+        </div>
+        <div class="stat-cell">
+          <span class="stat-icon"><i class="fa-solid fa-dice-d20"></i></span>
+          <span class="stat-num">{tabletopCount}</span>
+          <span class="stat-label">Tabletop</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Two-column layout ── -->
+    <div class="archive-layout">
+
+      <!-- ══ LISTINGS COLUMN ══ -->
+      <div class="archive-col">
+
+        <!-- Archive list -->
+        <div class="archive-list" role="list">
+          {years.map(year => {
+            const entries = byYear[year];
+            let globalIndex = allReviews.findIndex(r => r === entries[0]);
+            return (
+              <>
+                <div class="year-divider" role="separator">
+                  <div class="year-divider-rule"></div>
+                  <span class="year-divider-label">{yearToRoman(Number(year))}</span>
+                  <div class="year-divider-rule"></div>
+                  <span class="year-divider-count">{entries.length} {entries.length === 1 ? 'entry' : 'entries'}</span>
+                </div>
+
+                {entries.map((review, j) => {
+                  const idx = allReviews.indexOf(review) + 1;
+                  const isFeatured = review.data.featured || review.data.spotlight;
+                  return isFeatured ? (
+                    <a href={`/reviews/${review.id}`} class="archive-entry featured" role="listitem">
+                      <div class="featured-top">
+                        <span class="entry-num">{toRoman(idx)}</span>
+                        <span class="entry-cat">
+                          <i class={`fa-solid ${catIcon[review.data.category]}`}></i>
+                          {catLabel[review.data.category]}
+                          {review.data.spotlight ? ' · Monthly Spotlight' : ''}
+                        </span>
+                        {review.data.spotlight && <span class="featured-badge">Spotlight</span>}
+                      </div>
+                      <div class="entry-title-featured">{review.data.title}</div>
+                      <p class="entry-excerpt">{review.data.excerpt}</p>
+                      <div class="entry-meta-row">
+                        <span class="entry-date">{formatDateShort(review.data.date)}</span>
+                        <Rating category={review.data.category} score={review.data.rating} />
+                        <span class="entry-read">Read the Review</span>
+                      </div>
+                    </a>
+                  ) : (
+                    <a href={`/reviews/${review.id}`} class="archive-entry compact" role="listitem">
+                      <div class="compact-num">{toRoman(idx)}</div>
+                      <div class="compact-cat-col">
+                        <span class="entry-cat">
+                          <i class={`fa-solid ${catIcon[review.data.category]}`}></i>
+                          {catLabel[review.data.category]}
+                        </span>
+                      </div>
+                      <div class="compact-body">
+                        <span class="compact-title">{review.data.title}</span>
+                      </div>
+                      <div class="compact-meta-col">
+                        <span class="compact-date">{formatDateShort(review.data.date)}</span>
+                        <Rating category={review.data.category} score={review.data.rating} />
+                      </div>
+                    </a>
+                  );
+                })}
+              </>
+            );
+          })}
+        </div>
+
+        <!-- Pagination (static for now) -->
+        <nav class="pagination" aria-label="Archive pagination">
+          <span class="page-btn disabled">← Prev</span>
+          <span class="page-btn active">1</span>
+          <div class="page-spacer"></div>
+          <span class="page-summary">Page 1 of 1 · {totalCount} Chronicles</span>
+          <span class="page-btn disabled">Next →</span>
+        </nav>
+
+      </div>
+
+      <!-- ══ SIDEBAR ══ -->
+      <aside class="archive-sidebar" aria-label="Archive sidebar">
+
+        <!-- Browse by category -->
+        <div class="sidebar-block">
+          <div class="sidebar-label">Browse by Discipline</div>
+          <a href="/reviews" class="browse-item all-item">
+            <i class="fa-solid fa-book-open" style="font-size:0.7rem;color:var(--teal-lt);width:0.875rem;text-align:center;flex-shrink:0;"></i>
+            <span class="browse-name">All Chronicles</span>
+            <span class="browse-count">{totalCount}</span>
+          </a>
+          <a href="/reviews/music" class="browse-item">
+            <i class="fa-solid fa-skull"></i>
+            <span class="browse-name">Music</span>
+            <span class="browse-count">{musicCount}</span>
+          </a>
+          <a href="/reviews/fiction" class="browse-item">
+            <i class="fa-solid fa-khanda"></i>
+            <span class="browse-name">Fiction</span>
+            <span class="browse-count">{fictionCount}</span>
+          </a>
+          <a href="/reviews/tabletop" class="browse-item">
+            <i class="fa-solid fa-dice-d20"></i>
+            <span class="browse-name">Tabletop</span>
+            <span class="browse-count">{tabletopCount}</span>
+          </a>
+        </div>
+
+        <!-- Browse by year -->
+        <div class="sidebar-block">
+          <div class="sidebar-label">Browse by Year</div>
+          {years.map(year => (
+            <a href={`/reviews?year=${year}`} class="year-item">
+              <span class="year-label">{yearToRoman(Number(year))}</span>
+              <span class="year-spacer"></span>
+              <span class="year-count">{byYear[year].length}</span>
+              <div class="year-bar-wrap">
+                <div class="year-bar" style={`width:${Math.round((byYear[year].length / maxYearCount) * 100)}%`}></div>
+              </div>
+            </a>
+          ))}
+        </div>
+
+        <!-- Tag cloud -->
+        <div class="sidebar-block">
+          <div class="sidebar-label">Index of the Grimoire</div>
+          <div class="sidebar-tags">
+            {allTags.map(tag => (
+              <Tag label={tag} href={`/reviews?tag=${encodeURIComponent(tag)}`} />
+            ))}
+          </div>
+        </div>
+
+      </aside>
+
+    </div>
+  </main>
+</BaseLayout>
+
+<style>
+  /* ── ARCHIVE BANNER ── */
+  .archive-banner {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 1.75rem;
+    padding-bottom: 1.75rem;
+    margin-bottom: 1.75rem;
+    border-bottom: 1px solid var(--red-dim);
+    flex-wrap: wrap;
+  }
+  .archive-banner-text { flex: 1; min-width: 15rem; }
+  .archive-kicker {
+    font-family: 'Cinzel', serif;
+    font-size: 0.6rem; letter-spacing: 0.38em;
+    text-transform: uppercase; color: var(--teal-lt);
+    margin-bottom: 0.625rem;
+    display: flex; align-items: center; gap: 0.625rem;
+  }
+  .archive-kicker::after { content: ''; width: 2.5rem; height: 1px; background: var(--red-dim); }
+  .archive-title {
+    font-family: 'UnifrakturMaguntia', cursive;
+    font-size: clamp(2.2rem, 5vw, 3.4rem);
+    color: var(--teal-lt);
+    line-height: 1;
+    text-shadow: 0.0625rem 0.0625rem 0 rgba(0,0,0,0.2), 0 0 1.25rem rgba(138,180,176,0.2);
+    margin-bottom: 0.875rem;
+    letter-spacing: 0.02em;
+  }
+  .archive-desc {
+    font-family: 'IM Fell English', serif;
+    font-style: italic; font-size: 0.92rem;
+    line-height: 1.82; color: var(--white-dim);
+    max-width: 30rem;
+  }
+
+  .archive-stat-block {
+    display: flex;
+    border: 1px solid var(--red-dim);
+    align-self: flex-start; flex-shrink: 0;
+    background: var(--panel-bg);
+    box-shadow: inset 0 0 0 0.25rem var(--panel-bg), inset 0 0 0 0.3125rem var(--red-dim);
+  }
+  .stat-cell {
+    padding: 1rem 1.375rem;
+    border-right: 1px solid var(--red-dim);
+    text-align: center;
+  }
+  .stat-cell:last-child { border-right: none; }
+  .stat-num {
+    font-family: 'Cinzel Decorative', serif;
+    font-size: 1.6rem; font-weight: 700;
+    color: var(--red-pale);
+    text-shadow: 0.0625rem 0.0625rem 0 rgba(0,0,0,0.2);
+    line-height: 1; display: block; margin-bottom: 0.3125rem;
+  }
+  .stat-icon { font-size: 0.65rem; color: var(--amber); display: block; margin-bottom: 0.3125rem; }
+  .stat-label {
+    font-family: 'Cinzel', serif;
+    font-size: 0.52rem; letter-spacing: 0.3em;
+    text-transform: uppercase; color: var(--white-dim);
+    white-space: nowrap;
+  }
+
+  /* ── LAYOUT ── */
+  .archive-layout {
+    display: grid;
+    grid-template-columns: 1fr 16.75rem;
+    gap: 1.75rem;
+    align-items: start;
+  }
+  @media (max-width: 800px) { .archive-layout { grid-template-columns: 1fr; } }
+
+  /* ── ARCHIVE LIST ── */
+  .archive-list {
+    border: 1px solid var(--red-dim);
+    border-bottom: none;
+  }
+
+  .year-divider {
+    display: flex; align-items: center; gap: 0.875rem;
+    padding: 0.625rem 1.25rem;
+    background: var(--near-black);
+    border-bottom: 1px solid var(--red-dim);
+  }
+  .year-divider-rule { flex: 1; height: 1px; background: var(--red-dim); opacity: 0.5; }
+  .year-divider-label {
+    font-family: 'UnifrakturMaguntia', cursive;
+    font-size: 1.3rem; color: var(--red-dim);
+    text-shadow: 0.0625rem 0.0625rem 0 rgba(0,0,0,0.15);
+    letter-spacing: 0.04em; line-height: 1;
+  }
+  .year-divider-count {
+    font-family: 'Cinzel', serif;
+    font-size: 0.5rem; letter-spacing: 0.25em;
+    text-transform: uppercase; color: var(--white-dim); opacity: 0.45;
+  }
+
+  .archive-entry {
+    display: block; text-decoration: none; color: inherit;
+    border-bottom: 1px solid var(--red-dim);
+    transition: background 0.2s;
+    position: relative;
+  }
+  .archive-entry:last-child { border-bottom: none; }
+  .archive-entry:hover { background: rgba(196,148,122,0.04); }
+
+  .entry-num {
+    font-family: 'Cinzel', serif;
+    font-weight: 700; color: rgba(196,148,122,0.28);
+    letter-spacing: 0.05em; line-height: 1;
+    flex-shrink: 0; user-select: none;
+  }
+  .entry-cat {
+    font-family: 'Cinzel', serif;
+    font-size: 0.54rem; letter-spacing: 0.28em;
+    text-transform: uppercase; color: var(--teal-lt);
+    display: inline-flex; align-items: center; gap: 0.3125rem;
+    white-space: nowrap; flex-shrink: 0;
+  }
+  .entry-cat i { font-size: 0.56rem; color: var(--amber); }
+
+  /* Featured entry */
+  .archive-entry.featured {
+    padding: 1.375rem 1.375rem 1.125rem;
+    background: rgba(196,148,122,0.025);
+    border-left: 0.125rem solid var(--red-dim);
+  }
+  .archive-entry.featured:hover { background: rgba(196,148,122,0.055); }
+
+  .featured-top {
+    display: flex; align-items: baseline; gap: 0.875rem;
+    margin-bottom: 0.5rem;
+  }
+  .featured-top .entry-num { font-size: 1.2rem; }
+  .featured-badge {
+    font-family: 'Cinzel', serif;
+    font-size: 0.48rem; letter-spacing: 0.3em;
+    text-transform: uppercase; color: var(--red-pale);
+    border: 1px solid var(--red-dim); padding: 0.125rem 0.4375rem;
+    margin-left: auto; flex-shrink: 0;
+  }
+
+  .entry-title-featured {
+    font-family: 'Cinzel Decorative', serif;
+    font-size: 1.05rem; font-weight: 700; line-height: 1.2;
+    letter-spacing: 0.01em; color: var(--white);
+    text-shadow: 0.0625rem 0.0625rem 0 rgba(0,0,0,0.2), 0 0 0.875rem rgba(138,180,176,0.07);
+    margin-bottom: 0.1875rem;
+  }
+  .entry-excerpt {
+    font-family: 'IM Fell English', serif;
+    font-style: italic; font-size: 0.88rem;
+    line-height: 1.8; color: var(--white-dim);
+    margin-bottom: 0.875rem;
+    margin-top: 0.625rem;
+  }
+  .entry-meta-row {
+    display: flex; align-items: center; gap: 0.875rem;
+    flex-wrap: wrap;
+  }
+  .entry-date {
+    font-family: 'IM Fell English', serif;
+    font-style: italic; font-size: 0.72rem;
+    color: var(--amber);
+  }
+  .entry-read {
+    font-family: 'Cinzel', serif;
+    font-size: 0.56rem; letter-spacing: 0.25em;
+    text-transform: uppercase; color: var(--black);
+    background: var(--white); text-decoration: none;
+    padding: 0.3125rem 0.875rem; border: 1px solid var(--white);
+    transition: background 0.2s, color 0.2s, border-color 0.2s;
+    margin-left: auto;
+  }
+  .entry-read:hover { background: var(--red-dim); border-color: var(--red-dim); color: var(--white); }
+
+  /* Compact entry */
+  .archive-entry.compact {
+    display: flex; align-items: center;
+    gap: 0; padding: 0;
+    border-bottom: 1px solid rgba(196,148,122,0.15);
+  }
+  .compact-num {
+    font-family: 'Cinzel', serif;
+    font-size: 0.75rem; font-weight: 700;
+    color: rgba(196,148,122,0.3);
+    letter-spacing: 0.06em;
+    padding: 0.75rem 0 0.75rem 1.25rem;
+    width: 3.25rem; flex-shrink: 0;
+    line-height: 1;
+  }
+  .compact-cat-col {
+    width: 7.5rem; flex-shrink: 0;
+    padding: 0.75rem 0.625rem;
+    border-left: 1px solid rgba(196,148,122,0.12);
+    border-right: 1px solid rgba(196,148,122,0.12);
+  }
+  .compact-body {
+    flex: 1; min-width: 0;
+    padding: 0.75rem 1rem;
+  }
+  .compact-title {
+    font-family: 'Crimson Pro', serif;
+    font-size: 0.93rem; font-weight: 600;
+    color: var(--white); line-height: 1.3;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .compact-meta-col {
+    padding: 0.75rem 1.25rem 0.75rem 0.625rem;
+    display: flex; align-items: center; gap: 0.5rem;
+    flex-shrink: 0;
+    border-left: 1px solid rgba(196,148,122,0.12);
+  }
+  .compact-date {
+    font-family: 'IM Fell English', serif;
+    font-style: italic; font-size: 0.68rem;
+    color: var(--amber); white-space: nowrap;
+  }
+
+  @media (max-width: 640px) {
+    .archive-entry.compact { flex-wrap: wrap; }
+    .compact-cat-col { border: none; width: auto; padding-left: 0; padding-top: 0; }
+    .compact-body { padding-top: 0; padding-left: 0.625rem; width: calc(100% - 3.25rem); flex-basis: 100%; }
+    .compact-meta-col { border: none; padding-left: 3.25rem; padding-top: 0; }
+    .compact-title { white-space: normal; }
+  }
+
+  /* ── PAGINATION ── */
+  .pagination {
+    display: flex; align-items: stretch;
+    border: 1px solid var(--red-dim);
+    background: var(--near-black);
+    overflow: hidden; flex-wrap: wrap;
+  }
+  .page-btn {
+    font-family: 'Cinzel', serif;
+    font-size: 0.6rem; letter-spacing: 0.2em;
+    text-transform: uppercase; color: var(--white-dim);
+    padding: 0.625rem 1rem;
+    border-right: 1px solid var(--red-dim);
+    text-decoration: none; cursor: pointer;
+    transition: background 0.2s, color 0.2s;
+    display: flex; align-items: center; justify-content: center;
+    background: none; white-space: nowrap;
+  }
+  .page-btn:hover { background: var(--red-wash); color: var(--white); }
+  .page-btn.active { color: var(--teal-lt); background: rgba(138,180,176,0.06); }
+  .page-btn.disabled { color: var(--white-dim); opacity: 0.3; pointer-events: none; }
+  .page-spacer { flex: 1; border-right: 1px solid var(--red-dim); }
+  .page-summary {
+    font-family: 'IM Fell English', serif;
+    font-style: italic; font-size: 0.72rem;
+    color: var(--white-dim); opacity: 0.5;
+    padding: 0.625rem 1.125rem;
+    display: flex; align-items: center;
+  }
+
+  /* ── SIDEBAR ── */
+  .archive-sidebar {
+    display: flex; flex-direction: column;
+    border: 1px solid var(--red-dim);
+    position: sticky; top: 1.5rem;
+  }
+  .sidebar-block {
+    border-bottom: 1px solid var(--red-dim);
+    padding: 1.125rem 1.125rem 1rem;
+  }
+  .sidebar-block:last-child { border-bottom: none; }
+
+  .sidebar-label {
+    font-family: 'Cinzel', serif;
+    font-size: 0.58rem; letter-spacing: 0.3em;
+    text-transform: uppercase; color: var(--teal-lt);
+    margin-bottom: 0.875rem;
+    display: flex; align-items: center; gap: 0.5rem;
+  }
+  .sidebar-label::after { content: ''; flex: 1; height: 1px; background: var(--red-dim); }
+
+  .browse-item {
+    display: flex; align-items: center; gap: 0.625rem;
+    padding: 0.5625rem 0;
+    border-bottom: 1px solid rgba(196,148,122,0.12);
+    text-decoration: none; color: inherit;
+    transition: opacity 0.2s;
+  }
+  .browse-item:last-child { border-bottom: none; padding-bottom: 0; }
+  .browse-item:hover { opacity: 0.75; }
+  .browse-item i { font-size: 0.7rem; color: var(--amber); width: 0.875rem; text-align: center; flex-shrink: 0; }
+  .browse-name {
+    font-family: 'Cinzel', serif;
+    font-size: 0.62rem; letter-spacing: 0.2em;
+    text-transform: uppercase; color: var(--white); flex: 1;
+  }
+  .browse-item.all-item .browse-name { color: var(--teal-lt); }
+  .browse-count {
+    font-family: 'Cinzel Decorative', serif;
+    font-size: 0.78rem; font-weight: 700;
+    color: rgba(196,148,122,0.45);
+    letter-spacing: 0.05em;
+  }
+
+  .year-item {
+    display: flex; align-items: baseline; gap: 0.625rem;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid rgba(196,148,122,0.12);
+    text-decoration: none; color: inherit;
+    transition: opacity 0.2s;
+  }
+  .year-item:last-child { border-bottom: none; padding-bottom: 0; }
+  .year-item:hover { opacity: 0.75; }
+  .year-label {
+    font-family: 'UnifrakturMaguntia', cursive;
+    font-size: 1.1rem; color: var(--white-dim);
+    line-height: 1; letter-spacing: 0.03em;
+  }
+  .year-item:first-child .year-label { color: var(--white); }
+  .year-count {
+    font-family: 'Cinzel', serif;
+    font-size: 0.54rem; letter-spacing: 0.2em;
+    text-transform: uppercase; color: var(--white-dim); opacity: 0.55;
+  }
+  .year-spacer { flex: 1; }
+  .year-bar-wrap { width: 3rem; }
+  .year-bar { height: 0.125rem; background: var(--red-dim); opacity: 0.4; }
+
+  .sidebar-tags { display: flex; flex-wrap: wrap; gap: 0.3125rem; }
+</style>
