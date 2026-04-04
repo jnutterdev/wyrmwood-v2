@@ -7,6 +7,7 @@ rating: 4
 tags: ["hexcrawl", "osr", "module", "old-school", "campaign"]
 featured: false
 spotlight: false
+author: theron-quill
 byline: "By Theron Quill · January 2026"
 readTime: "10 min read"
 ---

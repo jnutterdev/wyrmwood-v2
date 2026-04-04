@@ -12,7 +12,8 @@ tags:
   - folk
 featured: false
 spotlight: true
-byline: By Rowan Ashfield · November 2025
+author: src/content/authors/john-forgotten.md
+byline: By John Forgotten · November 2025
 readTime: 7 min read
 ---
 

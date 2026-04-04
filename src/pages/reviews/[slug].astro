@@ -1,5 +1,5 @@
 ---
-import { getCollection, render } from 'astro:content';
+import { getCollection, getEntry, render } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import WPMonogram from '../../components/WPMonogram.astro';
 import Rating from '../../components/Rating.astro';
@@ -16,7 +16,10 @@ export async function getStaticPaths() {
 
 const { entry } = Astro.props;
 const { Content } = await render(entry);
-const { title, category, date, excerpt, rating, tags, byline, readTime } = entry.data;
+const { title, category, date, excerpt, rating, tags, byline, readTime, author: authorId } = entry.data;
+
+// Fetch author record if set
+const authorEntry = authorId ? await getEntry('authors', authorId) : null;
 
 // All reviews sorted by date desc
 const allReviews = (await getCollection('reviews')).sort(
@@ -58,8 +61,9 @@ function formatDate(dateStr: string): string {
 
 const formattedDate = formatDate(date);
 
-const authorName = byline ? byline.replace(/^By\s+/, '').split(/\s*·\s*/)[0] : 'The Editor';
-const authorGlyph = authorName.charAt(0).toUpperCase();
+const authorName  = authorEntry?.data.name ?? (byline ? byline.replace(/^By\s+/, '').split(/\s*·\s*/)[0] : 'The Editor');
+const authorBio   = authorEntry?.data.bio ?? 'Keeper of the Palisades. Writes about heavy music, high fantasy, and the spaces where the two meet.';
+const authorGlyph = authorEntry?.data.monogram ?? authorName.charAt(0).toUpperCase();
 
 const catDisplay = category.charAt(0).toUpperCase() + category.slice(1);
 const firstTag = tags[0] ? tags[0].replace(/-/g, ' ') : '';
@@ -193,10 +197,7 @@ const cardNumerals = ['II', 'III', 'IV', 'V'];
             <span class="author-monogram-glyph">{authorGlyph}</span>
           </div>
           <div class="author-name">{authorName}</div>
-          <p class="author-bio">
-            Keeper of the Palisades. Writes about heavy music, high fantasy, and the spaces
-            where the two meet. Has rolled dice until midnight more times than is strictly advisable.
-          </p>
+          <p class="author-bio">{authorBio}</p>
         </div>
 
         <!-- Related reviews -->

@@ -7,6 +7,7 @@ rating: 5
 tags: ["dungeon-synth", "old-school", "rpg-music", "cassette", "atmospheric"]
 featured: true
 spotlight: true
+author: aldric-vane
 byline: "By Aldric Vane · March 2026"
 readTime: "11 min read"
 ---

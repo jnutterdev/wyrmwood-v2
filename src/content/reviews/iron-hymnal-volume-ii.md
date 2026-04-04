@@ -7,6 +7,7 @@ rating: 5
 tags: ["epic-metal", "heavy", "mythology", "vinyl", "orchestral"]
 featured: false
 spotlight: false
+author: aldric-vane
 byline: "By Cressida Holt · February 2026"
 readTime: "9 min read"
 ---

@@ -7,6 +7,7 @@ rating: 4
 tags: ["fantasy", "literary", "empire", "succession", "quiet-fantasy"]
 featured: false
 spotlight: false
+author: cressida-holt
 byline: "By Cressida Holt · November 2025"
 readTime: "12 min read"
 ---

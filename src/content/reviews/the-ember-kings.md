@@ -7,6 +7,7 @@ rating: 5
 tags: ["fantasy", "debut", "epic", "world-building", "grimdark"]
 featured: false
 spotlight: true
+author: cressida-holt
 byline: "By Rowan Ashfield · February 2026"
 readTime: "13 min read"
 ---

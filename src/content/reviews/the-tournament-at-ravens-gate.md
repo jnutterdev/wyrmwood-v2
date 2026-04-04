@@ -7,6 +7,7 @@ rating: 5
 tags: ["one-shot", "social", "tournament", "intrigue", "comedy"]
 featured: false
 spotlight: false
+author: theron-quill
 byline: "By Theron Quill · October 2025"
 readTime: "6 min read"
 ---

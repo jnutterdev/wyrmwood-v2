@@ -21,13 +21,50 @@ export default defineConfig({
   schema: {
     collections: [
       {
+        name: 'authors',
+        label: 'Authors',
+        path: 'src/content/authors',
+        format: 'md',
+        ui: {
+          filename: {
+            readonly: false,
+            slugify: values =>
+              values.name
+                ?.toLowerCase()
+                .replace(/[^a-z0-9]+/g, '-')
+                .replace(/(^-|-$)/g, '') ?? '',
+          },
+        },
+        fields: [
+          {
+            type: 'string',
+            name: 'name',
+            label: 'Name',
+            isTitle: true,
+            required: true,
+          },
+          {
+            type: 'string',
+            name: 'bio',
+            label: 'Bio',
+            required: true,
+            ui: { component: 'textarea' },
+          },
+          {
+            type: 'string',
+            name: 'monogram',
+            label: 'Monogram',
+            description: 'Single character shown in the author badge. Defaults to first letter of name.',
+          },
+        ],
+      },
+      {
         name: 'reviews',
         label: 'Reviews',
         path: 'src/content/reviews',
         format: 'md',
         ui: {
           filename: {
-            // Slug is derived from the title automatically
             readonly: false,
             slugify: values =>
               values.title
@@ -63,9 +100,7 @@ export default defineConfig({
             name: 'excerpt',
             label: 'Excerpt',
             required: true,
-            ui: {
-              component: 'textarea',
-            },
+            ui: { component: 'textarea' },
           },
           {
             type: 'number',
@@ -88,6 +123,12 @@ export default defineConfig({
             type: 'boolean',
             name: 'spotlight',
             label: 'Spotlight',
+          },
+          {
+            type: 'reference',
+            name: 'author',
+            label: 'Author',
+            collections: ['authors'],
           },
           {
             type: 'string',

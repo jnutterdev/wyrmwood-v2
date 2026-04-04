@@ -7,6 +7,7 @@ rating: 4
 tags: ["wargame", "tactical", "setting", "supplement", "fantasy"]
 featured: false
 spotlight: false
+author: theron-quill
 byline: "By Aldric Vane · December 2025"
 readTime: "8 min read"
 ---
